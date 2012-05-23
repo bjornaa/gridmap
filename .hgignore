@@ -6,6 +6,10 @@ syntax: glob
 # Byte-compiled python files
 *.pyc
 
+# Build and dist files
+build/*
+dist/*
+
 # NetCDF files
 *.nc
 
