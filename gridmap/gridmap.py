@@ -27,19 +27,19 @@ class Ellipsoid(object):
 class Sphere(Ellipsoid):
     def __init__(self, radius=6371000.0):  # met.no default
         Ellipsoid.__init__(self, a=radius)
-        
-class WGS84(Ellipsoid):
-    def __init__(self):
-        Ellipsoid.__init__(self, a=6378137.0, invf=298.257223563)
-        
+                
+# Common instances
+sphere = Sphere()   # default radius
+WGS84  = Ellipsoid(a=6378137.0, invf=298.257223563)
+
 # -------------------------------------
 # Polar Stereographic grid map class
 # -------------------------------------
 
-class PolarGridMap(object):
-    """Polarstereographic grid mapping"""
+class PolarStereographic(object):
+    """Polar stereographic grid mapping"""
 
-    def __init__(self, xp, yp, dx, ylon, lat_c=None, ellipsoid=Sphere()):
+    def __init__(self, xp, yp, dx, ylon, lat_c=None, ellipsoid=sphere):
         self.xp    = xp     # x-coordinate of north pole
         self.yp    = yp     # y-coordinate of north pole
         self.dx    = dx     # grid resolution [m]
@@ -52,7 +52,7 @@ class PolarGridMap(object):
 
         phi_c = self.lat_c*rad    
         e = self.ellipsoid.e
-        print "e = ", e
+        #print "e = ", e
         t_c = tan(0.25*pi-0.5*phi_c)             \
                / ((1-e*sin(phi_c))/(1+e*sin(phi_c)))**(0.5*e)
         m_c = cos(phi_c) / sqrt(1-(e*sin(phi_c))**2)
@@ -161,14 +161,14 @@ class PolarGridMap(object):
 # -------------
 
 def gridmap_fromfile(nc, var='h'):
-    """Create a PolarGridMap instance from a netCDF file
+    """Create a PolarStereographic instance from a netCDF file
 
     arguments:
     nc : open netcdf-file (netCDF4.Dataset instance)
     var, optional : variable in the netcdf file with mapping attribvute
                default is topography 'h'
     
-    returns: PolarGridMap instance
+    returns: PolarStereographic instance
 
     The mapping attributes must follow the CF-standard
     + additional attributes, ellipsoid and dx.
@@ -185,7 +185,7 @@ def gridmap_fromfile(nc, var='h'):
     v = nc.variables[grid_mapping_variable]
     # 
     if v.ellipsoid == 'WGS84':
-        ellipsoid = WGS84()
+        ellipsoid = WGS84
     else:
         ellipsoid = Sphere(v.earth_radius)
     xp = v.false_easting
@@ -194,7 +194,7 @@ def gridmap_fromfile(nc, var='h'):
     dx = v.dx
     lat_c = v.standard_parallel
 
-    return PolarGridMap(xp, yp, dx, ylon, lat_c, ellipsoid)
+    return PolarStereographic(xp, yp, dx, ylon, lat_c, ellipsoid)
 
 
 

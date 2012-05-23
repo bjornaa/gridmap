@@ -7,39 +7,43 @@
 # Institute of Marine Research
 # ----------------------------------
 
-#import os
+import sys
 from math import pi
 import unittest
+sys.path = ['../gridmap'] + sys.path # import from developing version
 import gridmap
 
 # ------------------------------------
 
-class test_PolarGridMap(unittest.TestCase):
+class test_PolarStereographic(unittest.TestCase):
 
     xp, yp, dx, ylon = 418.25, 257.25, 10000.0, 58.0
-    map0 = gridmap.PolarGridMap(xp, yp, dx, ylon)
-    map1 = gridmap.PolarGridMap(xp, yp, dx, ylon,
-                                              ellipsis=gridmap.WGS84())
+    map0 = gridmap.PolarStereographic(xp, yp, dx, ylon)
+    map1 = gridmap.PolarStereographic(xp, yp, dx, ylon, 
+                                      ellipsoid=gridmap.WGS84)
 
     def test_sphere_values(self):
         """Test some check values using spherical earth
 
-Check values from proj4
-proj +proj=stere +ellps=sphere +lat_0=90 +lon_0=ylon +lat_ts=60 \
-     +x_0=xp*dx +y_0=yp*dx
-"""
+        Check values from proj4 with projstring
+        +proj=stere +a=6371000.0 +lat_0=90 +lat_ts=60.0 \
+        +x_0=4182500.0 +y_0=2572500.0 +lon_0=58.0
 
-        lon, lat = 2, 66                   # Station M
-        x0, y0 = 208.754990, 115.943832    # from proj4
+        """
+        
+        print self.map0.projstring2()
+
+        lon, lat = 2, 66                                 # Station M
+        x0, y0 = 208.75489165788943, 115.9437651864196  # from proj4
         x, y = self.map0.ll2grid(lon, lat)
-        self.assertAlmostEqual(x, x0, places=6) 
-        self.assertAlmostEqual(y, y0, places=6) 
+        self.assertAlmostEqual(x, x0, places=12)
+        self.assertAlmostEqual(y, y0, places=12)
 
         lon, lat = 5.323333, 60.3925       # Bergen
         x, y = self.map0.ll2grid(lon, lat)
         x0, y0 = 168.398192, 66.753081     # from proj4
-        self.assertAlmostEqual(x, x0, places=6)
-        self.assertAlmostEqual(y, y0, places=6) 
+        self.assertAlmostEqual(x, x0, places=12)
+        self.assertAlmostEqual(y, y0, places=12) 
 
     def test_WGS84_values(self):
         """Test some check values using WGS84 ellipsoid
