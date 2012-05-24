@@ -15,7 +15,7 @@ on sphere or WGS84 ellipsoid
 
 import numpy as np
 from netCDF4 import Dataset
-from gridmap import PolarGridMap, WGS84
+#from gridmap import PolarStereographic, WGS84
 
 def create_grid(gmap, Lm, Mm, grid_name, file_name):
 

@@ -1,2 +1,2 @@
-from gridmap import Ellipsoid, Sphere, WGS84, PolarGridMap, gridmap_fromfile
+from gridmap import *
 from define_grid import create_grid

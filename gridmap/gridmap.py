@@ -4,6 +4,9 @@
 
 from numpy import pi, sqrt, sin, cos, tan, arctan, arctan2
 
+all = ['Ellipsoid', 'Sphere', 'sphere', 'WGS84', 
+       'PolarStereographic', 'gridmap_fromfile']
+
 deg = 180.0 / pi
 rad = pi / 180.0
 
