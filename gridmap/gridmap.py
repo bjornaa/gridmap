@@ -15,7 +15,7 @@ rad = pi / 180.0
 # -------------------------
 
 class Ellipsoid(object):
-    def __init__(self, a, invf=None):
+    def __init__(self, a, invf=None, name='general'):
         self.a = a                        # major semi-axis [m]
         self.invf = invf                  # inverse flattening
         if invf == None:    # sphere case
@@ -24,16 +24,14 @@ class Ellipsoid(object):
             self.f = 1.0 / invf           
         self.e = sqrt((2-self.f)*self.f)  # eccentrity
         self.b = a*(1-self.f)             # minor semi-axis [m]
-        #self.a = 6370997.0  # Med denne klaffer det
-        # mer og mer feil jo lengre unna.
 
 class Sphere(Ellipsoid):
     def __init__(self, radius=6371000.0):  # met.no default
-        Ellipsoid.__init__(self, a=radius)
+        Ellipsoid.__init__(self, a=radius, name='Sphere')
                 
 # Common instances
 sphere = Sphere()   # default radius
-WGS84  = Ellipsoid(a=6378137.0, invf=298.257223563)
+WGS84  = Ellipsoid(a=6378137.0, invf=298.257223563, name=WGS84)
 
 # -------------------------------------
 # Polar Stereographic grid map class
