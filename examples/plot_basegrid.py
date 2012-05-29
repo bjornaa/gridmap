@@ -17,7 +17,7 @@ def plot_basegrid(gmap, Lm, Mm):
     # Bør Lm og Mm være med i PolarGridMap-objektet?
     # Må nå inn som separate argument.
 
-    if isinstance(gmap.ellipsoid, gridmap.WGS84): 
+    if gmap.ellipsoid.name == "WGS84":
         rsphere=(gmap.ellipsoid.a, gmap.ellipsoid.b)
     else:
         rsphere = gmap.ellipsoid.a
@@ -46,11 +46,20 @@ def plot_basegrid(gmap, Lm, Mm):
 
 # ----------------------------
 
-f = Dataset('b0.nc')
-gmap = gridmap.gridmap_fromfile(f)
+#f = Dataset('b0.nc')
+#gmap = gridmap.gridmap_fromfile(f)
+#Lp, Mp = len(f.dimensions['xi_rho']), len(f.dimensions['eta_rho'])
+#Lm, Mm = Lp-2, Mp-2
+# Grid parameters
+xp    = 418.25        # x grid coordinate of north pole
+yp    = 257.25        # y grid coordinate of north pole
+dx    = 10000         # grid resolution (at lat_c)       [m]
+ylon  = 58.0          # angle of y-axis                  [deg]
 
-Lp, Mp = len(f.dimensions['xi_rho']), len(f.dimensions['eta_rho'])
-Lm, Mm = Lp-2, Mp-2
+gmap = gridmap.PolarStereographic(xp, yp, dx, ylon,
+                                  ellipsoid=gridmap.WGS84)
+
+Lm, Mm = 200, 100
 
 p = plot_basegrid(gmap, Lm, Mm)
 
