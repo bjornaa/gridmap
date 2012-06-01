@@ -63,6 +63,14 @@ class test_PolarStereographic0(unittest.TestCase):
         lon1, lat1 = self.map1.grid2ll(x, y)
         self.assertAlmostEqual(lon1, self.ylon, places=13)
 
+        # x = xp, => angle = 0
+        x, y = self.xp, 222.222
+        angle0 = self.map0.angle(x, y)
+        self.assertEqual(angle0, 0.0)
+        angle1 = self.map1.angle(x, y)
+        self.assertEqual(angle1, 0.0)
+
+
     def test_inverse(self):
         """grid2ll and ll2grid are inverse"""
         lon, lat = 5.323333, 60.3925   # Bergen
@@ -78,6 +86,7 @@ class test_PolarStereographic0(unittest.TestCase):
         self.assertAlmostEqual(lat1, lat, places=10)
 
         x, y = 200.0, 133.12345
+
         lon0, lat0 = self.map0.grid2ll(x, y)
         x0, y0 = self.map0.ll2grid(lon0, lat0)
         self.assertAlmostEqual(x0, x, places=12)
@@ -87,6 +96,29 @@ class test_PolarStereographic0(unittest.TestCase):
         x1, y1 = self.map1.ll2grid(lon1, lat1)
         self.assertAlmostEqual(x1, x, places=9)
         self.assertAlmostEqual(y1, y, places=10)
+
+    def test_angle(self):
+        """angle = ylon - lon"""
+        lon, lat = 5.323333, 60.3925   # Bergen
+        angle = (self.ylon - lon)*pi/180
+        x0, y0 = self.map0.ll2grid(lon, lat)
+        angle0 = self.map0.angle(x0, y0)
+        self.assertAlmostEqual(angle0, angle, places=15)
+        x1, y1 = self.map1.ll2grid(lon, lat)
+        angle0 = self.map1.angle(x1, y1)
+        self.assertAlmostEqual(angle0, angle, places=15)
+        
+    def test_scale(self):
+        """scale = 1 at 60 deg"""
+        lon, lat = -10.0, 60.0
+        x0, y0 = self.map0.ll2grid(lon, lat)
+        scale0 = self.map0.map_scale(x0, y0)
+        self.assertAlmostEqual(scale0, 1.0, places=15)
+        x1, y1 = self.map1.ll2grid(lon, lat)
+        scale1 = self.map1.map_scale(x1, y1)
+        self.assertAlmostEqual(scale1, 1.0, places=12)
+
+        
 
 if __name__ == '__main__':
     unittest.main()
