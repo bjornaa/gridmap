@@ -64,7 +64,9 @@ if __name__ == '__main__':
 
     #verbose = True
 
+    # ----------------------------
     print "\n --- sphere ---\n"
+    # ----------------------------
 
     gmap = PolarStereographic(xp, yp, dx, ylon)
 
@@ -77,7 +79,7 @@ if __name__ == '__main__':
     #ellipsoid = "--ELLIPSOID=%s" % "6378137,298.257223563" # WGS84 OK
     #ellipsoid = "--ELLIPSOID=%s" % "6371000,f=0"
 
-    extent = '-R0/100/60/61'   # Actual values are not used
+    extent = '-R0/1/60/61'   # Actual values are not used
     offset = '-C%s/%s' % (str(xp), str(yp))
     gmtstring = " ".join((ellipsoid, projection, offset, extent))
 
@@ -88,15 +90,18 @@ if __name__ == '__main__':
     print "gmt mapproject : ", x1, y1
     print "gmap.ll2grid   : ", x0, y0
     print "difference [m] : ", ((x1-x0)**2 + (y1-y0)**2)**0.5 * gmap.dx
-
+    print
+    
+    gmap = PolarStereographic(xp, yp, dx, ylon)
     lon0, lat0 = gmap.grid2ll(x, y)
-    #lon1, lat1 = invproj(gmap.projstring, x*gmap.dx, y*gmap.dx)
-    #print
-    #print "invproj        : ", lon1, lat1
-    #print "gmap.grid2ll   : ", lon0, lat0
+    lon1, lat1 = mapproject('-I ' + gmtstring, x, y, verbose=True)
+    print "mapproject -I  : ", lon1, lat1
+    print "gmap.grid2ll   : ", lon0, lat0
 
 
+    # ---------------------------
     print "\n --- WGS84 ---\n"
+    # ---------------------------
 
     gmap = PolarStereographic(xp, yp, dx, ylon, ellipsoid=WGS84)
 
