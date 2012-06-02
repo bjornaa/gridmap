@@ -46,18 +46,22 @@ WGS84  = Ellipsoid(a=6378137.0, invf=298.257223563, name='WGS84')
 class PolarStereographic(object):
     """Polar stereographic grid mapping"""
 
-    def __init__(self, xp, yp, dx, ylon, lat_c=None, ellipsoid=sphere):
+    def __init__(self, xp, yp, dx, ylon,
+                 shape=None, lat_ts=None, ellipsoid=sphere):
         self.xp    = xp     # x-coordinate of north pole
         self.yp    = yp     # y-coordinate of north pole
         self.dx    = dx     # grid resolution [m]
         self.ylon  = ylon   # longitude parallell to y-axis [deg]
-        if lat_c:
-            self.lat_c = lat_c  # latitude of true scale [deg]
+
+        self.shape = shape  # Number of internal grid cells (Lm, Mm)
+        
+        if lat_ts:
+            self.lat_ts = lat_ts  # latitude of true scale [deg]
         else:
-            self.lat_c = 60.0   # met.no default 
+            self.lat_ts = 60.0   # met.no default 
         self.ellipsoid = ellipsoid
 
-        phi_c = self.lat_c*rad    
+        phi_c = self.lat_ts*rad    
         e = self.ellipsoid.e
         t_c = tan(0.25*pi-0.5*phi_c)             \
                / ((1-e*sin(phi_c))/(1+e*sin(phi_c)))**(0.5*e)
@@ -137,7 +141,7 @@ class PolarStereographic(object):
         lon_0 = "+lon_0=" + str(self.ylon)
         x_0 = "+x_0=" + str(self.xp*self.dx)
         y_0 = "+y_0=" + str(self.yp*self.dx)
-        lat_ts = "+lat_ts=" + str(self.lat_c)
+        lat_ts = "+lat_ts=" + str(self.lat_ts)
         projlist = [proj, ellps, lat_0, lat_ts, x_0, y_0, lon_0]
         return " ".join(projlist)
 
@@ -170,7 +174,7 @@ class PolarStereographic(object):
                            area_thresh=area_thresh, 
                            rsphere=rsphere,
                            lat_0 = 90.0, lon_0 = self.ylon,
-                           lat_ts = self.lat_c)
+                           lat_ts = self.lat_ts)
 
         
 
@@ -208,9 +212,11 @@ def fromfile(nc, var='h'):
     yp = v.false_northing
     ylon = v.straight_vertical_longitude_from_pole
     dx = v.dx
-    lat_c = v.standard_parallel
+    lat_ts = v.standard_parallel
+    Lp, Mp = nc.variables[var].shape
+    shape = (Lp-2, Mp-2)
 
-    return PolarStereographic(xp, yp, dx, ylon, lat_c, ellipsoid)
+    return PolarStereographic(xp, yp, dx, ylon, shape, lat_ts, ellipsoid)
 
 
 

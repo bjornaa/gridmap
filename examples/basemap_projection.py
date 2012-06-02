@@ -11,7 +11,7 @@ import gridmap
 # Grid parameters
 xp    = 418.25        # x grid coordinate of north pole
 yp    = 257.25        # y grid coordinate of north pole
-dx    = 10000         # grid resolution (at lat_c)       [m]
+dx    = 10000         # grid resolution (at lat_ts)      [m]
 ylon  = 58.0          # angle of y-axis                  [deg]
 
 

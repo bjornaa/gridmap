@@ -56,7 +56,7 @@ if __name__ == '__main__':
 
     xp    = 418.25        # x grid coordinate of north pole
     yp    = 257.25        # y grid coordinate of north pole
-    dx    = 10000         # grid resolution (at lat_c)   [m]
+    dx    = 10000         # grid resolution (at lat_ts)  [m]
     ylon  = 58.0          # angle of y-axis        [deg]
 
     lon, lat = 2, 66   # Station M
@@ -68,7 +68,8 @@ if __name__ == '__main__':
 
     gmap = PolarStereographic(xp, yp, dx, ylon)
 
-    projection = '-Js%s/90.0/%s/1:%s' % (str(ylon), str(gmap.lat_c), str(100*dx))
+    projection = '-Js%s/90.0/%s/1:%s' % \
+                 (str(ylon), str(gmap.lat_ts), str(100*dx))
     #ellipsoid = "--ELLIPSOID=Sphere"
     #ellipsoid = "--ELLIPSOID=WGS-84"
     ## Ser ut som ellipsoid er gitt på korrekt vis, men får feil
@@ -100,7 +101,8 @@ if __name__ == '__main__':
 
     gmap = PolarStereographic(xp, yp, dx, ylon, ellipsoid=WGS84)
 
-    projection = '-Js%s/90.0/%s/1:%s' % (str(ylon), str(gmap.lat_c), str(100*dx))
+    projection = '-Js%s/90.0/%s/1:%s' % \
+                 (str(ylon), str(gmap.lat_ts), str(100*dx))
     extent = '-R0/1/60/61'   # Actual values are not used
     offset = '-C%s/%s' % (str(xp), str(yp))
     gmtstring = " ".join((projection, offset, extent))
