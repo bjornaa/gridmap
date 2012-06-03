@@ -11,7 +11,7 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   auda.rst
+   polarstereographic.rst
    generate_grid.rst
 
 

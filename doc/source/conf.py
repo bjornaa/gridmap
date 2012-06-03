@@ -25,14 +25,14 @@ sys.path.insert(0, os.path.abspath('../sphinxext'))
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-#extensions = ['sphinx.ext.autodoc', 'sphinx.ext.mathjax', 'sphinx.ext.viewcode']
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.mathjax', 'sphinx.ext.viewcode']
 #extensions = ['sphinx.ext.autodoc', 'sphinx.ext.pngmath', 'sphinx.ext.viewcode']
-extensions = ['matplotlib.sphinxext.mathmpl', 
-              'math_symbol_table',
-              'sphinx.ext.autodoc']
-              #'matplotlib.sphinxext.plot_directive', 
-              #'gen_gallery', 'gen_rst',
-              #'matplotlib.sphinxext.ipython_console_highlighting']
+#extensions = ['matplotlib.sphinxext.mathmpl', 
+#              'math_symbol_table',
+#              'sphinx.ext.autodoc']
+#              #'matplotlib.sphinxext.plot_directive', 
+#              #'gen_gallery', 'gen_rst',
+#              #'matplotlib.sphinxext.ipython_console_highlighting']
 
 
 
