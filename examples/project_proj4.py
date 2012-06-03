@@ -17,6 +17,7 @@ def proj(projstring, lon, lat):
 
     # Set up the proj process
     #if verbose: print command
+    print command
     p = subprocess.Popen(command, shell=True,
                      stdin=subprocess.PIPE, 
                      stdout=subprocess.PIPE)

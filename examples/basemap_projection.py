@@ -18,7 +18,6 @@ ylon  = 58.0          # angle of y-axis                  [deg]
 lon, lat = 2, 66      # Station M
 #lon, lat = 2, 90      # North Pole
 
-
 # --------------------------------------------------------
 
 # sphere case
@@ -45,16 +44,12 @@ print x0, y0
 
 print "distance [m] = ", ((x-x0)**2 + (y-y0)**2)**0.5 * dx
 
-
-
 print "\n --- WGS84 --- \n"
-
 
 gmap = gridmap.PolarStereographic(xp, yp, dx, ylon,
                                   ellipsoid=gridmap.WGS84)
 x0, y0 = gmap.ll2grid(lon, lat)
 print x0, y0
-
 
 # WGS84 parameters
 a = 6378137.0
@@ -72,11 +67,4 @@ y = y / dx + yp
 
 print x, y
 
-
 print "distance [m] = ", ((x-x0)**2 + (y-y0)**2)**0.5 * dx
-
-
-
-
-
-
