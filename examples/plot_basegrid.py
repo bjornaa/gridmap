@@ -11,7 +11,7 @@ import gridmap
 
 # Define plotting function in basemap
 
-def plot_basegrid(gmap):
+def plot_basegrid(gmap, Lm, Mm):
     """Plot filled coastline for grid defined by gmap"""
 
     # Bør Lm og Mm være med i PolarGridMap-objektet?
@@ -24,7 +24,6 @@ def plot_basegrid(gmap):
 
     # Compute lon/lat of grid corners (needed by basemap=
     llcrnrlon, llcrnrlat = gmap.grid2ll(-0.5, -0.5)
-    Lm, Mm = gmap.shape
     urcrnrlon, urcrnrlat = gmap.grid2ll(Lm+1.5, Mm+1.5)
 
     p = Basemap(llcrnrlon=llcrnrlon, llcrnrlat=llcrnrlat,
@@ -35,7 +34,7 @@ def plot_basegrid(gmap):
                 rsphere=rsphere,
                 lat_0 = 90.0,
                 lon_0 = gmap.ylon,
-                lat_ts = gmap.lat_ts)
+                lat_ts = gmap.lat_c)
 
     p.drawcoastlines()
     p.fillcontinents(color='grey', lake_color='grey')
@@ -54,17 +53,15 @@ def plot_basegrid(gmap):
 # Grid parameters
 xp    = 418.25        # x grid coordinate of north pole
 yp    = 257.25        # y grid coordinate of north pole
-dx    = 10000         # grid resolution (at lat_ts)      [m]
+dx    = 10000         # grid resolution (at lat_c)       [m]
 ylon  = 58.0          # angle of y-axis                  [deg]
+
+gmap = gridmap.PolarStereographic(xp, yp, dx, ylon,
+                                  ellipsoid=gridmap.WGS84)
 
 Lm, Mm = 200, 100
 
-gmap = gridmap.PolarStereographic(xp, yp, dx, ylon,
-                                  shape=(Lm,Mm),
-                                  ellipsoid=gridmap.WGS84)
-
-
-p = plot_basegrid(gmap)
+p = plot_basegrid(gmap, Lm, Mm)
 
 plt.show()
 

@@ -216,7 +216,7 @@ def fromfile(nc, var='h'):
     Lp, Mp = nc.variables[var].shape
     shape = (Lp-2, Mp-2)
 
-    return PolarStereographic(xp, yp, dx, ylon, shape, lat_ts, ellipsoid)
+    return PolarStereographic(xp, yp, dx, ylon, shape lat_ts, ellipsoid)
 
 
 
