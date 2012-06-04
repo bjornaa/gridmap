@@ -17,7 +17,7 @@ import numpy as np
 from netCDF4 import Dataset
 #from gridmap import PolarStereographic, WGS84
 
-def create_grid(gmap, Lm, Mm, grid_name, file_name):
+def create_grid(gmap, grid_name, file_name):
 
 
     gridmap_varname = 'grid_mapping' # Name of grid mapping variable
@@ -40,6 +40,10 @@ def create_grid(gmap, Lm, Mm, grid_name, file_name):
     nc.institution = "Institute of Marine Research"
 
     # Define dimensions
+    try:
+        Lm, Mm = gmap.shape
+    except TypeError:  # gmap.shape == None
+        raise AttributeError, "grid mapping needs shape attribute"
     L, M = Lm+1, Mm+1
     Lp, Mp = Lm+2, Mm+2
     nc.createDimension('xi_rho',  Lp)
@@ -147,7 +151,7 @@ def create_grid(gmap, Lm, Mm, grid_name, file_name):
         v.earth_radius = gmap.ellipsoid.a
     v.latitude_of_projection_origin = 90.0
     v.straight_vertical_longitude_from_pole = gmap.ylon
-    v.standard_parallel = gmap.lat_c
+    v.standard_parallel = gmap.lat_ts
     v.scale_factor_at_projection_origin = gmap.k_0 / gmap.dx
     v.false_easting  = gmap.xp
     v.false_northing = gmap.yp
