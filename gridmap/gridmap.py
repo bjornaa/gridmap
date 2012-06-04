@@ -66,7 +66,7 @@ class PolarStereographic(object):
         t_c = tan(0.25*pi-0.5*phi_c)             \
                / ((1-e*sin(phi_c))/(1+e*sin(phi_c)))**(0.5*e)
         m_c = cos(phi_c) / sqrt(1-(e*sin(phi_c))**2)
-        self.k_0 = 0.5 * m_c * sqrt((1+e)**(1+e)*(1-e)**(1-e)) / t_c
+        #self.k_0 = 0.5 * m_c * sqrt((1+e)**(1+e)*(1-e)**(1-e)) / t_c
         self.t_c, self.m_c = t_c, m_c
 
         # Make an option string for proj4
@@ -106,7 +106,7 @@ class PolarStereographic(object):
             phi = chi                                                         \
                  + (e**2/2 + 5*e**4/24 + e**6/12 + 13*e**8/360) * sin(2*chi)  \
                  + (7*e**4/48 + 29*e**6/240 + 811*e**8/11520) * sin(4*chi)    \
-                 + (7*e**6/120 +  81*e**8/1120) * sin(6*chi)                  \
+*                 + (7*e**6/120 +  81*e**8/1120) * sin(6*chi)                  \
                  + (4279*e**8/161280) * sin(8*chi)
         else:
             phi = chi

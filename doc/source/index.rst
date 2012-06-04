@@ -12,6 +12,7 @@ Contents:
    :maxdepth: 2
 
    polarstereographic.rst
+   other_systems.rst
    generate_grid.rst
 
 
