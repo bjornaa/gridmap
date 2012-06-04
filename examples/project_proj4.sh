@@ -1,4 +1,4 @@
-#!/bin/sh
+#! /bin/sh
 
 # Using proj4 from given parameters
 
