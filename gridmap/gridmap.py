@@ -106,7 +106,7 @@ class PolarStereographic(object):
             phi = chi                                                         \
                  + (e**2/2 + 5*e**4/24 + e**6/12 + 13*e**8/360) * sin(2*chi)  \
                  + (7*e**4/48 + 29*e**6/240 + 811*e**8/11520) * sin(4*chi)    \
-*                 + (7*e**6/120 +  81*e**8/1120) * sin(6*chi)                  \
+                 + (7*e**6/120 +  81*e**8/1120) * sin(6*chi)                  \
                  + (4279*e**8/161280) * sin(8*chi)
         else:
             phi = chi
