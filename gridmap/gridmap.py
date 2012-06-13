@@ -70,7 +70,7 @@ class PolarStereographic(object):
         self.t_c, self.m_c = t_c, m_c
 
         # Make an option string for proj4
-        self.projstring = self._projstring()
+        self.proj4string = self._proj4string()
 
         
     def ll2grid(self, lon, lat):
@@ -130,7 +130,7 @@ class PolarStereographic(object):
         m = cos(phi) / sqrt(1-(e*sin(phi))**2)
         return rho / (a * m)
 
-    def _projstring(self):
+    def _proj4string(self):
         proj = "+proj=stere"
         ellipsoid = self.ellipsoid
         if ellipsoid.name == 'WGS84':
