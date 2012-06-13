@@ -11,6 +11,8 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
+   netcdf.rst
+   gridmap.rst
    polarstereographic.rst
    other_systems.rst
    generate_grid.rst
