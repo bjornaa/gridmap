@@ -136,6 +136,7 @@ def create_grid(gmap, grid_name, file_name):
 
     # Comments on the CF-standard (v. 1.2)
     # attributes ellipsoid and dx are not required by CF
+    # unclear if both standard_parallel and scale_factor are allowed
     # No standard name for the grid map variable, call it gridmap_varname
     # Question: use gmap.xp*gmap.dx for false_easting??
 
