@@ -55,6 +55,40 @@ def create_grid(gmap, grid_name, file_name):
     nc.createDimension('xi_psi',  L)
     nc.createDimension('eta_psi', M)
     nc.createDimension('bath',    None)
+
+    # --- Coordinate variables --- 
+    # Not required by ROMS, but recommended by CF standard
+
+    v = nc.createVariable('xi_rho', 'f', ('xi_rho',))
+    v.long_name = "X coordinate of RHO-points"
+    v.standard_name = "projection_x_coordinate"
+    v.units = "meter"
+
+    v = nc.createVariable('eta_rho', 'f', ('eta_rho',))
+    v.long_name = "Y coordinate of RHO-points"
+    v.standard_name = "projection_y_coordinate"
+    v.units = "meter"
+
+    v = nc.createVariable('xi_u', 'f', ('xi_u',))
+    v.long_name = "X coordinate of U-points"
+    v.standard_name = "projection_x_coordinate"
+    v.units = "meter"
+
+    v = nc.createVariable('eta_u', 'f', ('eta_u',))
+    v.long_name = "Y coordinate of U-points"
+    v.standard_name = "projection_y_coordinate"
+    v.units = "meter"
+
+    v = nc.createVariable('xi_v', 'f', ('xi_v',))
+    v.long_name = "X coordinate of V-points"
+    v.standard_name = "projection_x_coordinate"
+    v.units = "meter"
+
+    v = nc.createVariable('eta_v', 'f', ('eta_v',))
+    v.long_name = "Y coordinate of V-points"
+    v.standard_name = "projection_y_coordinate"
+    v.units = "meter"
+
     
     # --- Geographic variables
 
@@ -90,7 +124,7 @@ def create_grid(gmap, grid_name, file_name):
 
     v = nc.createVariable('angle', 'f', ('eta_rho', 'xi_rho'))
     v.long_name = "angle between xi axis and east"
-    v.standard_name = "angle of rotation from east to x"
+    v.standard_name = "angle_of_rotation_from_east_to_x"
     v.units = "radian"
     v.coordinates = "lon_rho lat_rho"
     v.mapping = gridmap_varname
@@ -232,6 +266,16 @@ def create_grid(gmap, grid_name, file_name):
     # ------------------------------------------------------
 
     print "Saving geometric variables"
+
+    # -----------------------
+    # Coordinate variables
+    # -----------------------
+    nc.variables['xi_rho'][:]  = gmap.dx*np.arange(Lp)
+    nc.variables['eta_rho'][:] = gmap.dx*np.arange(Mp)
+    nc.variables['xi_u'][:]    = gmap.dx*(np.arange(L)+0.5)
+    nc.variables['eta_u'][:]   = gmap.dx*np.arange(Mp)
+    nc.variables['xi_v'][:]    = gmap.dx*np.arange(Lp)
+    nc.variables['eta_v'][:]   = gmap.dx*(np.arange(M)+0.5)
 
     # ----------
     # Vertices 

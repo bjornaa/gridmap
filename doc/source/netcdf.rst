@@ -2,10 +2,19 @@
 Grid file specification
 =======================
 
-The grid file follows the CF-standard http://cf-pcmdi.llnl.gov/.
+The ROMS grid file shall meet the following requirements
+
+1. It should work without modifying ROMS
+
+2. It should make clear what projection is being used
+
+3. It should follow the CF-standard as far as possible
+
+The CF-standard http://cf-pcmdi.llnl.gov/ section 5.6 describes how to
+indicate the horizontal coordinate system and the mapping projection. 
 Version 1.2 of the standard gives conventions for the polar
 stereographic mapping. This is done by defining a variable without
-data and attributes::
+data and with the following attributes::
 
   grid_mapping_name
   straight_vertical_longitude_from_pole
@@ -21,7 +30,7 @@ parametes are set to::
   straight_vertical_longitude_from_pole = ylon
   1atitude_of_projection origin = 90.0
   standard_parallell = 60.0
-  false_easting = `xp`
+  false_easting = xpx
   false_northing = yp
 
 In addition the following general mapping attributes are used
@@ -37,7 +46,7 @@ and for WGS84::
 Two extra attributes not required by the CF-standard are
 useful additions::
 
-  dx = `dx`
+  dx = dx
   proj4string = option string used by proj4 to recreate the mapping
 
 Spørsmål: Er det mer korrekt å bruke.

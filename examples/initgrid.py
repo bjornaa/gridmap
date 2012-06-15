@@ -4,8 +4,6 @@
 """Initiate a small demo grid"""
 
 import gridmap
-#import define_grid
-
 
 # ----------------
 # User settings
@@ -18,7 +16,7 @@ xp, yp, dx, ylon = 418.25, 257.25, 10000, 58
 
 # Number of internal grid cells
 # deliberately small numbers for the demo
-Lm, Mm = 125, 100
+Lm, Mm = 10, 8
 
 # Name of grid
 grid_name = "demo10km"
