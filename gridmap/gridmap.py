@@ -47,7 +47,7 @@ class PolarStereographic(object):
     """Polar stereographic grid mapping"""
 
     def __init__(self, xp, yp, dx, ylon,
-                 shape=None, lat_ts=None, ellipsoid=sphere):
+                 Lm=None, Mm=None, lat_ts=60, ellipsoid=sphere):
         self.xp    = xp     # x-coordinate of north pole
         self.yp    = yp     # y-coordinate of north pole
         self.dx    = dx     # grid resolution [m]
@@ -56,12 +56,10 @@ class PolarStereographic(object):
 
         # OOPS, not compatible with shape of arrays (Mp, Lp)
         # Use self.Mm, self.Lm instead?
-        self.shape = shape  # Number of internal grid cells (Lm, Mm)
-        
-        if lat_ts:
-            self.lat_ts = lat_ts  # latitude of true scale [deg]
-        else:
-            self.lat_ts = 60.0   # met.no default 
+        #self.shape = shape  # Number of internal grid cells (Lm, Mm)
+        self.Lm = Lm
+        self.Mm = Mm
+        self.lat_ts = lat_ts  # latitude of true scale [deg]
         self.ellipsoid = ellipsoid
 
         phi_c = self.lat_ts*rad    
@@ -109,7 +107,7 @@ class PolarStereographic(object):
             phi = chi                                                         \
                  + (e**2/2 + 5*e**4/24 + e**6/12 + 13*e**8/360) * sin(2*chi)  \
                  + (7*e**4/48 + 29*e**6/240 + 811*e**8/11520) * sin(4*chi)    \
-*                 + (7*e**6/120 +  81*e**8/1120) * sin(6*chi)                  \
+                 + (7*e**6/120 +  81*e**8/1120) * sin(6*chi)                  \
                  + (4279*e**8/161280) * sin(8*chi)
         else:
             phi = chi
@@ -165,10 +163,9 @@ class PolarStereographic(object):
 
             # Compute lon/lat of grid corners (needed by basemap)
             lon0, lat0 = self.grid2ll(0.0, 0.0)
-            try:
-                Mm, Lm = self.shape
-            except TypeError:  # No shape
-                raise AttributeError, "basemap needs shape attribute"
+            Lm, Mm = self.Lm, self.Mm
+            if not Lm:
+                raise AttributeError, "basemap needs Lm, Mm attributes"
             lon1, lat1 = self.grid2ll(Lm+1.0, Mm+1.0)
                 
             return Basemap(llcrnrlon=lon0, llcrnrlat=lat0,
@@ -218,9 +215,11 @@ def fromfile(nc, var='h'):
     dx = v.dx
     lat_ts = v.standard_parallel
     Mp, Lp = nc.variables[var].shape
-    shape = (Mp-2, Lp-2)
+    Lm, Mm = Lp-2, Mp-2
 
-    return PolarStereographic(xp, yp, dx, ylon, shape, lat_ts, ellipsoid)
+    #return PolarStereographic(xp, yp, dx, ylon, shape, lat_ts, ellipsoid)
+    return PolarStereographic(xp, yp, dx, ylon,
+                Lm=Lm, Mm=Mm, lat_ts=lat_ts, ellipsoid=ellipsoid)
 
 
 

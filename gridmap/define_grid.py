@@ -40,10 +40,9 @@ def create_grid(gmap, grid_name, file_name):
     nc.institution = "Institute of Marine Research"
 
     # Define dimensions
-    try:
-        Lm, Mm = gmap.shape
-    except TypeError:  # gmap.shape == None
-        raise AttributeError, "grid mapping needs shape attribute"
+    Lm, Mm = gmap.Lm, gmap.Mm
+    if not Lm:
+        raise AttributeError, "grid mapping needs Lm and Mm attributes"
     L, M = Lm+1, Mm+1
     Lp, Mp = Lm+2, Mm+2
     nc.createDimension('xi_rho',  Lp)

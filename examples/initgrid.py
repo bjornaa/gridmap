@@ -29,9 +29,9 @@ file_name = grid_name + "_grd.nc"
 # Define the grid map object, with grid size
 try:
     gmap = gridmap.PolarStereographic(xp, yp, dx, ylon, 
-                                      (Lm, Mm), ellipsoid=ellipsoid)
+                   Lm=Lm, Mm=Mm, ellipsoid=ellipsoid)
 except NameError:   # ellipsoid not set, using default (= sphere)
-    gmap = gridmap.PolarStereographic(xp, yp, dx, ylon, (Lm, Mm))
+    gmap = gridmap.PolarStereographic(xp, yp, dx, ylon, Lm, Mm)
 
 # Create the ROMS grid file
 gridmap.create_grid(gmap, grid_name, file_name)
