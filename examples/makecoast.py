@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-### OOPS, missing France!!! (Eurasia)
-### med små verdier av Lm, Mm
 
 """Make a coast line for a polar stereographic grid
 
@@ -11,23 +9,34 @@
 
 """
 
+# Note: Bug in 1.0.3  european continent may be missing
+# Fixed in 1.0.4
+
 # -------------------------------------------
 # Bjørn Ådlandsvik <bjorn@imr.no>
 # Institute of Marine Research
 # 2012-05-27
 # -------------------------------------------
 
-
 import numpy as np
 from mpl_toolkits.basemap import Basemap
+from netCDF4 import Dataset
 import gridmap
 
 # --------------
 # Functions
 # --------------
 
-def make_coast(bmap):
+def get_coast(bmap):
+    """Use basemap to extract the coast line
 
+    Input:
+        bmap: Basemap instance.
+    Output:
+        X, Y: 1D arrays of x, y coordinates of coast line.
+              Segments are separated by Nan's
+    """
+    
     X, Y = [], []
 
     for polygon, ptype in zip(p.coastpolygons, p.coastpolygontypes):
@@ -37,13 +46,10 @@ def make_coast(bmap):
             X.append(np.nan)
             Y.append(np.nan)
 
-    # Adjust for origin, in the center of the first grid cell
-    X = np.array(X)/gmap.dx - 0.5
-    Y = np.array(Y)/gmap.dx - 0.5
-
-    return X, Y
+    return np.array(X), np.array(Y)
 
 def save_coast(filename, X, Y):
+    """Save a coast line to a text file"""
     fmt = '%9.4f %9.4f\n'
     f = open(filename, 'w')
     for xy in zip(X, Y):
@@ -56,22 +62,28 @@ if __name__ == '__main__':
     # User settings 
     # -------------------
 
-    xp, yp, dx, ylon = 418.25, 257.25, 10000, 58.0
-    Lm, Mm = 125, 100
-    #Lm, Mm = 880, 660
+    gridfile  = "demo10km_grd.nc"
+    coastfile = "demo10km_coast.dat"
 
     # Set GSHHS resolution, 'c', 'l', 'i', 'h', 'f'
     # (crude, low, intermediate, high, or full
-    
     resolution = 'i'  
 
-    gmap = gridmap.PolarStereographic(xp, yp, dx, ylon)
+    # Define gridmap instance from the grid file
+    f = Dataset(gridfile)
+    gmap = gridmap.fromfile(f)
 
-    p = gmap.basemap(Lm, Mm, resolution, area_thresh=None)
+    # Define a Basemap instance
+    p = gmap.basemap(resolution)
 
-    X, Y = make_coast(p)
+    # Make basemap extract the coast line
+    X, Y = get_coast(p)
+    # Scale to grid coordinates
+    # NB. What should be origin in gridmap.basemap???
+    X = X/gmap.dx
+    Y = Y/gmap.dx
 
-    save_coast('a.dat', X, Y)
+    save_coast(coastfile, X, Y)
 
     
     

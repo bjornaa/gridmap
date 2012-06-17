@@ -53,6 +53,9 @@ class PolarStereographic(object):
         self.dx    = dx     # grid resolution [m]
         self.ylon  = ylon   # longitude parallell to y-axis [deg]
 
+
+        # OOPS, not compatible with shape of arrays (Mp, Lp)
+        # Use self.Mm, self.Lm instead?
         self.shape = shape  # Number of internal grid cells (Lm, Mm)
         
         if lat_ts:
@@ -147,10 +150,7 @@ class PolarStereographic(object):
 
     
     if has_basemap:
-        def basemap(self, Lm, Mm, resolution='i', area_thresh=None):
-            # Basere det hele på 0 til Lm+1
-            # => projeksjon = samme, plott litt begrenset
-            #                bare halve randceller
+        def basemap(self, resolution='i', area_thresh=None):
 
             # Check ellipsoid
             ellipsoid = self.ellipsoid
@@ -164,9 +164,13 @@ class PolarStereographic(object):
                 area_thresh = 0.5*(self.dx**2) / 1.e6  
 
             # Compute lon/lat of grid corners (needed by basemap)
-            lon0, lat0 = self.grid2ll(-0.5, -0.5)
-            lon1, lat1 = self.grid2ll(Lm+1.5, Mm+1.5)
-
+            lon0, lat0 = self.grid2ll(0.0, 0.0)
+            try:
+                Mm, Lm = self.shape
+            except TypeError:  # No shape
+                raise AttributeError, "basemap needs shape attribute"
+            lon1, lat1 = self.grid2ll(Lm+1.0, Mm+1.0)
+                
             return Basemap(llcrnrlon=lon0, llcrnrlat=lat0,
                            urcrnrlon=lon1, urcrnrlat=lat1,
                            projection='stere',           
@@ -213,8 +217,8 @@ def fromfile(nc, var='h'):
     ylon = v.straight_vertical_longitude_from_pole
     dx = v.dx
     lat_ts = v.standard_parallel
-    Lp, Mp = nc.variables[var].shape
-    shape = (Lp-2, Mp-2)
+    Mp, Lp = nc.variables[var].shape
+    shape = (Mp-2, Lp-2)
 
     return PolarStereographic(xp, yp, dx, ylon, shape, lat_ts, ellipsoid)
 
