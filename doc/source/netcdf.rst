@@ -13,12 +13,27 @@ The ROMS grid file shall meet the following requirements
 This is possible, since ROMS does not care about additional attributes
 or variables, as long as it gets what it want.
 
+Global attributes
+-----------------
+
+
 Dimensions
 ----------
 
 As the grid is staggered ROMS expect a series of dimensions in the
 :math:`\xi` and :math:`\eta` directions. They are named `xi_m` and `eta_m`
 where the modifier `m` indicates the stagerring, 'rho', 'u', 'v', or 'psi'.
+
+
+Coordinate variables
+--------------------
+
+
+
+
+Grid mapping variable
+---------------------
+
 
 
 
