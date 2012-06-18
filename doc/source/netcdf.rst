@@ -10,6 +10,33 @@ The ROMS grid file shall meet the following requirements
 
 3. It should follow the CF-standard as far as possible
 
+This is possible, since ROMS does not care about additional attributes
+or variables, as long as it gets what it want.
+
+Dimensions
+----------
+
+As the grid is staggered ROMS expect a series of dimensions in the
+:math:`\xi` and :math:`\eta` directions. They are named `xi_m` and `eta_m`
+where the modifier `m` indicates the stagerring, 'rho', 'u', 'v', or 'psi'.
+
+
+
+
+To follow the CF-standard new attributes are added to the data,
+`standard_name` when there is one, `coordinates` and
+`mapping`::
+
+  float h(eta_rho, xi_rho) ;
+         h:long_name = "Final bathymetry at RHO-points" ;
+         h:standard_name = "sea_floor_depth" ;
+         h:units = "meter" ;
+         h:field = "bath, scalar" ;
+         h:coordinates = "lon_rho lat_rho" ;
+         h:mapping = "grid_mapping" ;
+
+
+
 The CF-standard http://cf-pcmdi.llnl.gov/ section 5.6 describes how to
 indicate the horizontal coordinate system and the mapping projection. 
 Version 1.2 of the standard gives conventions for the polar
