@@ -4,7 +4,7 @@
 import subprocess
 import struct
 from math import pi
-from gridmap import *
+from gridmap import PolarStereographic
 
 #verbose=True
 
@@ -104,7 +104,7 @@ if __name__ == '__main__':
     print "\n --- WGS84 ---\n"
     # ---------------------------
 
-    gmap = PolarStereographic(xp, yp, dx, ylon, ellipsoid=WGS84)
+    gmap = PolarStereographic(xp, yp, dx, ylon, ellipsoid="WGS84")
 
     projection = '-Js%s/90.0/%s/1:%s' % \
                  (str(ylon), str(gmap.lat_ts), str(100*dx))
@@ -122,15 +122,9 @@ if __name__ == '__main__':
     print "difference [m] : ", ((x1-x0)**2 + (y1-y0)**2)**0.5 * gmap.dx
     print
     
-    gmap = PolarStereographic(xp, yp, dx, ylon, ellipsoid=WGS84)
+    gmap = PolarStereographic(xp, yp, dx, ylon, ellipsoid="WGS84")
     lon0, lat0 = gmap.grid2ll(x, y)
     lon1, lat1 = mapproject('-I ' + gmtstring, x, y, verbose=True)
     print "mapproject -I  : ", lon1, lat1
     print "gmap.grid2ll   : ", lon0, lat0
-
-
-
-
-
-
 

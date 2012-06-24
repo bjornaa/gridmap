@@ -13,7 +13,7 @@ Does not require the gridmap module
 # ----------------------------------
 
 
-import numpy as np
+#import numpy as np
 from netCDF4 import Dataset
 import matplotlib.pyplot as plt
 from mpl_toolkits.basemap import Basemap

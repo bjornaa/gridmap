@@ -22,9 +22,6 @@ lon, lat = 2, 66      # Station M
 
 # sphere case
 
-#gmap = gridmap.PolarStereographic(xp, yp, dx, ylon,
-#                        ellipsoid=gridmap.WGS84)
-
 print "\n --- Sphere --- \n"
 
 p = Basemap(projection='stere', rsphere=6371000,
@@ -46,8 +43,7 @@ print "distance [m] = ", ((x-x0)**2 + (y-y0)**2)**0.5 * dx
 
 print "\n --- WGS84 --- \n"
 
-gmap = gridmap.PolarStereographic(xp, yp, dx, ylon,
-                                  ellipsoid=gridmap.WGS84)
+gmap = gridmap.PolarStereographic(xp, yp, dx, ylon, ellipsoid='WGS84')
 x0, y0 = gmap.ll2grid(lon, lat)
 print x0, y0
 

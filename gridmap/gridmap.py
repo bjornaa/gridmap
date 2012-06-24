@@ -47,7 +47,7 @@ class PolarStereographic(object):
     """Polar stereographic grid mapping"""
 
     def __init__(self, xp, yp, dx, ylon,
-                 Lm=None, Mm=None, lat_ts=60, ellipsoid=sphere):
+                 Lm=None, Mm=None, ellipsoid=sphere, lat_ts=60.0):
         self.xp    = xp     # x-coordinate of north pole
         self.yp    = yp     # y-coordinate of north pole
         self.dx    = dx     # grid resolution [m]
@@ -60,6 +60,9 @@ class PolarStereographic(object):
         self.Lm = Lm
         self.Mm = Mm
         self.lat_ts = lat_ts  # latitude of true scale [deg]
+        # Allow string arguments for ellipsoid
+        if ellipsoid == "WGS84": ellipsoid = WGS84
+        if ellipsoid == "sphere": ellipsoid = sphere
         self.ellipsoid = ellipsoid
 
         phi_c = self.lat_ts*rad    

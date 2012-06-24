@@ -20,7 +20,7 @@ print "\n --- sphere ---\n"
 
 gmap = gridmap.PolarStereographic(xp, yp, dx, ylon)
 
-print gmap.projstring
+#print gmap.proj4string
 
 1/0
 
@@ -44,10 +44,9 @@ print "gmap.grid2ll   : ", lon0, lat0
 
 print "\n --- WGS84 ---\n"
 
-gmap = gridmap.PolarStereographic(xp, yp, dx, ylon,
-                                  ellipsoid=gridmap.WGS84)
+gmap = gridmap.PolarStereographic(xp, yp, dx, ylon, ellipsoid='WGS84')
 
-pmap = pyproj.Proj(gmap.projstring)
+pmap = pyproj.Proj(gmap.proj4string)
 
 x0, y0 = gmap.ll2grid(lon, lat)
 x1, y1 = pmap(lon, lat)

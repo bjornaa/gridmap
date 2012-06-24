@@ -12,7 +12,7 @@ import gridmap
 # Polar stereographic map projection
 xp, yp, dx, ylon = 418.25, 257.25, 10000, 58
 # Uncomment the following line for WGS84 ellipsoid
-#ellipsoid = gridmap.WGS84
+#ellipsoid = 'WGS84'
 
 # Number of internal grid cells
 # deliberately small numbers for the demo
