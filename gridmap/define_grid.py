@@ -19,7 +19,6 @@ from netCDF4 import Dataset
 
 def create_grid(gmap, grid_name, file_name):
 
-
     gridmap_varname = 'grid_mapping' # Name of grid mapping variable
 
     # -----------------------
@@ -171,7 +170,6 @@ def create_grid(gmap, grid_name, file_name):
     # attributes ellipsoid and dx are not required by CF
     # unclear if both standard_parallel and scale_factor are allowed
     # No standard name for the grid map variable, call it gridmap_varname
-    # Question: use gmap.xp*gmap.dx for false_easting??
 
     v = nc.createVariable(gridmap_varname, 'i', ())
     v.long_name = "grid mapping"
@@ -186,9 +184,8 @@ def create_grid(gmap, grid_name, file_name):
     v.latitude_of_projection_origin = 90.0
     v.straight_vertical_longitude_from_pole = gmap.ylon
     v.standard_parallel = gmap.lat_ts
-    #v.scale_factor_at_projection_origin = gmap.k_0 / gmap.dx
-    v.false_easting  = gmap.xp
-    v.false_northing = gmap.yp
+    v.false_easting  = gmap.xp*gmap.dx
+    v.false_northing = gmap.yp*gmap.dx
     v.dx = gmap.dx
     v.proj4string = gmap.proj4string
 
