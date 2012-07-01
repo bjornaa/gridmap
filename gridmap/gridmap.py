@@ -212,10 +212,10 @@ def fromfile(nc, var='h'):
         ellipsoid = WGS84
     else:
         ellipsoid = Sphere(v.earth_radius)
-    xp = v.false_easting
-    yp = v.false_northing
-    ylon = v.straight_vertical_longitude_from_pole
     dx = v.dx
+    xp = v.false_easting / dx
+    yp = v.false_northing / dx
+    ylon = v.straight_vertical_longitude_from_pole
     lat_ts = v.standard_parallel
     Mp, Lp = nc.variables[var].shape
     Lm, Mm = Lp-2, Mp-2

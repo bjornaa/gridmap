@@ -57,32 +57,32 @@ def create_grid(gmap, grid_name, file_name):
     # --- Coordinate variables --- 
     # Not required by ROMS, but recommended by CF standard
 
-    v = nc.createVariable('xi_rho', 'f', ('xi_rho',))
+    v = nc.createVariable('xi_rho', 'd', ('xi_rho',))
     v.long_name = "X coordinate of RHO-points"
     v.standard_name = "projection_x_coordinate"
     v.units = "meter"
 
-    v = nc.createVariable('eta_rho', 'f', ('eta_rho',))
+    v = nc.createVariable('eta_rho', 'd', ('eta_rho',))
     v.long_name = "Y coordinate of RHO-points"
     v.standard_name = "projection_y_coordinate"
     v.units = "meter"
 
-    v = nc.createVariable('xi_u', 'f', ('xi_u',))
+    v = nc.createVariable('xi_u', 'd', ('xi_u',))
     v.long_name = "X coordinate of U-points"
     v.standard_name = "projection_x_coordinate"
     v.units = "meter"
 
-    v = nc.createVariable('eta_u', 'f', ('eta_u',))
+    v = nc.createVariable('eta_u', 'd', ('eta_u',))
     v.long_name = "Y coordinate of U-points"
     v.standard_name = "projection_y_coordinate"
     v.units = "meter"
 
-    v = nc.createVariable('xi_v', 'f', ('xi_v',))
+    v = nc.createVariable('xi_v', 'd', ('xi_v',))
     v.long_name = "X coordinate of V-points"
     v.standard_name = "projection_x_coordinate"
     v.units = "meter"
 
-    v = nc.createVariable('eta_v', 'f', ('eta_v',))
+    v = nc.createVariable('eta_v', 'd', ('eta_v',))
     v.long_name = "Y coordinate of V-points"
     v.standard_name = "projection_y_coordinate"
     v.units = "meter"
@@ -90,37 +90,37 @@ def create_grid(gmap, grid_name, file_name):
     
     # --- Geographic variables
 
-    v = nc.createVariable('lon_rho', 'f', ('eta_rho', 'xi_rho'))
+    v = nc.createVariable('lon_rho', 'd', ('eta_rho', 'xi_rho'))
     v.long_name = "longitude of RHO-points"
     v.standard_name = "longitude"
     v.units = "degrees_east"
 
-    v = nc.createVariable('lat_rho', 'f', ('eta_rho', 'xi_rho'))
+    v = nc.createVariable('lat_rho', 'd', ('eta_rho', 'xi_rho'))
     v.long_name = "latitude of RHO-points"
     v.standard_name = "latitude"
     v.units = "degrees_north"
 
-    v = nc.createVariable('lon_u', 'f', ('eta_u', 'xi_u'))
+    v = nc.createVariable('lon_u', 'd', ('eta_u', 'xi_u'))
     v.long_name = "longitude of U-points"
     v.standard_name = "longitude"
     v.units = "degrees_east"
 
-    v = nc.createVariable('lat_u', 'f', ('eta_u', 'xi_u'))
+    v = nc.createVariable('lat_u', 'd', ('eta_u', 'xi_u'))
     v.long_name = "latitude of U-points"
     v.standard_name = "latitude"
     v.units = "degrees_north"
 
-    v = nc.createVariable('lon_v', 'f', ('eta_v', 'xi_v'))
+    v = nc.createVariable('lon_v', 'd', ('eta_v', 'xi_v'))
     v.long_name = "longitude of V-points"
     v.standard_name = "longitude"
     v.units = "degrees_east"
 
-    v = nc.createVariable('lat_v', 'f', ('eta_v', 'xi_v'))
+    v = nc.createVariable('lat_v', 'd', ('eta_v', 'xi_v'))
     v.long_name = "latitude of V-points"
     v.standard_name = "latitude"
     v.units = "degrees_north"
 
-    v = nc.createVariable('angle', 'f', ('eta_rho', 'xi_rho'))
+    v = nc.createVariable('angle', 'd', ('eta_rho', 'xi_rho'))
     v.long_name = "angle between xi axis and east"
     v.standard_name = "angle_of_rotation_from_east_to_x"
     v.units = "radian"
@@ -136,28 +136,28 @@ def create_grid(gmap, grid_name, file_name):
 
     # --- Metric terms
 
-    v = nc.createVariable('pm', 'f', ('eta_rho', 'xi_rho'))
+    v = nc.createVariable('pm', 'd', ('eta_rho', 'xi_rho'))
     v.long_name = "curvilinear coordinate metric in XI"
     v.units = "meter-1"
     v.field = "pm, scalar"
     v.coordinates = "lon_rho lat_rho"
     v.mapping = gridmap_varname
 
-    v = nc.createVariable('pn', 'f', ('eta_rho', 'xi_rho'))
+    v = nc.createVariable('pn', 'd', ('eta_rho', 'xi_rho'))
     v.long_name = "curvilinear coordinate metric in ETA"
     v.units = "meter-1"
     v.field = "pn, scalar"
     v.coordinates = "lon_rho lat_rho"
     v.mapping = gridmap_varname
 
-    v = nc.createVariable('dndx', 'f', ('eta_rho', 'xi_rho'))
+    v = nc.createVariable('dndx', 'd', ('eta_rho', 'xi_rho'))
     v.long_name = "xi derivative of inverse metric factor pn"
     v.units = "meter"
     v.field = "dndx, scalar"
     v.coordinates = "lon_rho lat_rho"
     v.mapping = gridmap_varname
 
-    v = nc.createVariable('dmde', 'f', ('eta_rho', 'xi_rho'))
+    v = nc.createVariable('dmde', 'd', ('eta_rho', 'xi_rho'))
     v.long_name = "eta derivative of inverse metric factor pm"
     v.units = "meter"
     v.field = "pn, scalar"
@@ -191,7 +191,7 @@ def create_grid(gmap, grid_name, file_name):
 
     # --- Topography
 
-    v = nc.createVariable('hraw', 'f', ('bath', 'eta_rho', 'xi_rho'))
+    v = nc.createVariable('hraw', 'd', ('bath', 'eta_rho', 'xi_rho'))
     v.long_name = "Working bathymetry at RHO-points"
     v.standard_name = "sea_floor_depth"
     v.units = "meter" 
@@ -199,7 +199,7 @@ def create_grid(gmap, grid_name, file_name):
     v.coordinates = "lon_rho lat_rho"
     v.mapping = gridmap_varname
 
-    v = nc.createVariable('h', 'f', ('eta_rho', 'xi_rho'))
+    v = nc.createVariable('h', 'd', ('eta_rho', 'xi_rho'))
     v.long_name = "Final bathymetry at RHO-points"
     v.standard_name = "sea_floor_depth"
     v.units = "meter"
@@ -209,7 +209,7 @@ def create_grid(gmap, grid_name, file_name):
 
     # --- Coriolis
 
-    v = nc.createVariable('f', 'f', ('eta_rho', 'xi_rho'))
+    v = nc.createVariable('f', 'd', ('eta_rho', 'xi_rho'))
     v.long_name = 'Coriolis parameter at RHO-points'
     v.standard_name = "coriolis_parameter"
     v.units = 'second-1'
@@ -219,7 +219,7 @@ def create_grid(gmap, grid_name, file_name):
 
     # --- Masks 
 
-    v = nc.createVariable('mask_rho', 'f', ('eta_rho', 'xi_rho'))
+    v = nc.createVariable('mask_rho', 'd', ('eta_rho', 'xi_rho'))
     v.long_name = "mask on RHO-points" 
     #v.standard_name = "sea_binary_mask"   # Not in standard table 
     v.option_0 = "land" 
@@ -227,21 +227,21 @@ def create_grid(gmap, grid_name, file_name):
     v.coordinates = "lon_rho lat_rho"
     v.mapping = gridmap_varname
 
-    v = nc.createVariable ('mask_u', 'f', ('eta_u', 'xi_u'))
+    v = nc.createVariable ('mask_u', 'd', ('eta_u', 'xi_u'))
     v.long_name = "mask on U-points" 
     v.option_0 = "land" 
     v.option_1 = "water" 
     v.coordinates = "lon_u lat_u"
     v.mapping = gridmap_varname
 
-    v = nc.createVariable('mask_v', 'f', ('eta_v', 'xi_v'))
+    v = nc.createVariable('mask_v', 'd', ('eta_v', 'xi_v'))
     v.long_name = "mask on V-points" 
     v.option_0 = "land" 
     v.option_1 = "water" 
     v.coordinates = "lon_v lat_v"
     v.mapping = gridmap_varname
 
-    v = nc.createVariable('mask_psi', 'f', ('eta_psi', 'xi_psi'))
+    v = nc.createVariable('mask_psi', 'd', ('eta_psi', 'xi_psi'))
     v.long_name = "mask on PSI-points" 
     v.option_0 = "land" 
     v.option_1 = "water" 
@@ -249,11 +249,11 @@ def create_grid(gmap, grid_name, file_name):
     # These variables, xl and el are not used by ROMS
     # but are required?
 
-    v = nc.createVariable('xl', 'f', ())
+    v = nc.createVariable('xl', 'd', ())
     v.long_name = "domain length in the XI-direction" 
     v.units = "meter" 
 
-    v = nc.createVariable('el', 'f', ())
+    v = nc.createVariable('el', 'd', ())
     v.long_name = "domain length in the ETA-direction" 
     v.units = "meter" 
 

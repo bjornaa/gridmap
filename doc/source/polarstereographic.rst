@@ -17,7 +17,7 @@ North Pole to the projected point is given by:
 
 Taking differentials gives
 
-.. math:: dr = - \frac{r_0}{1 + \sin \phi} d\phi
+.. math:: dr = - \frac{R}{r_0}{1 + \sin \phi} d\phi
 
 The standard spherical metric is
 
@@ -27,51 +27,50 @@ The standard spherical metric is
 In the projected plane this becomes
 
 .. math:: g = R^2 \cos^2 \phi d\lambda \otimes d\lambda
-             + \frac{R^2}{r_0^2} (1 + \sin \phi)^2 dr \otimes dt
+             + \frac{R^2}{r_0^2} (1 + \sin \phi)^2 dr \otimes dr
 
 Using Cartesian coordinates :math:`x`, :math:`y` in the projected
 plane, we have differential relations for polar coordinates
 
 .. math:: dr = \frac{x}{r} dx + \frac{y}{r} dy, \\
-          d\lambda = - \frac{y}{r^2} dx + \frac{x}{r^2} dx
-
+          d\lambda = - \frac{y}{r} dx + \frac{x}{r} dy
 
 This gives
 
-.. math:: g = m^2 dx \otimes dx + n^2 dy \otimes dy
+.. math:: g = \frac{1}{m^2} dx \otimes dx + \frac{1}{n^2} dy \otimes dy
 
 with metric coeffients
 
-.. math:: m = n = \frac{R}{r_0} (1 + \sin \phi)
+.. math:: m = n = \frac{r_0}{R (1 + \sin \phi)}
 
 The lack of cross term shows that this is an `orthogonal` coordinate
 system, and :math:`m=n` shows that it is `conformal`
 (angle-preserving).  The scale factor :math:`r_0` can be determined by
-requiring true scale at latitude :math:`phi_0`, i.e. :math:`m(\phi_0) = 1` or
+requiring true scale at latitude :math:`\phi_0`, i.e. :math:`m(\phi_0) = 1` or
 
 .. math:: r_0 = R (1 + \sin \phi_0)
 
 This throws out the earth radius, giving the expression
 
-.. math:: m = \frac{1 + \sin \phi}{1 + \sin \phi_0}
+.. math:: m = \frac{1 + \sin \phi_0}{1 + \sin \phi}
 
 For computations in the orhogonal coordinates systems, the partial
 derivatives :math:`m_y` and :math:`n_x` are needed. They are the
 terms ``dmde`` and ``dndx`` in ROMS.
 
-.. math:: dm = \frac{R}{r_0} \cos \phi d\phi
-             = -\frac{R}{r_0^2} \cos \phi (1 + \sin \phi) dr
-	     = -\frac{R}{r_0 r^2}(1 + \sin \phi)^2 (xdx + ydy)
+.. math:: d\frac{1}{m} = 
+      - \frac{R}{r_0} \frac{\cos^2 \phi}{(1+\sin \phi)^2} dr
+      = \frac{R}{r_0 m^2} (xdx + ydy)
             
-This gives 
+(mellomledd er feil) This gives 
 
-.. math:: \frac{\partial m}{\partial y} = -\frac{y R}{r_0 r^2}(1 + \sin \phi)^2 
-             = - \frac{R^3}{r_0^5} \frac{y}{m^2}
+.. math:: \frac{\partial m^{-1}}{\partial x} = \frac{R x}{r_0 m^2} 
+          = \frac{x(1 + \sin \phi)^2}{(1 + \sin \phi_0)^3}
 
 and
 
-.. math:: \frac{\partial n}{\partial x} = \frac{\partial m}{\partial x} 
-             = - \frac{R^3}{r_0^5} \frac{x}{m^2}
+.. math:: \frac{\partial n^{-1}}{\partial x} = 
+          \frac{\partial m^{-1}}{\partial x} = \frac{R y}{r_0 m^2}
 
 
 The general ellipsoid case
