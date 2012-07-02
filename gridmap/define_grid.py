@@ -338,6 +338,12 @@ def create_grid(gmap, grid_name, file_name):
     dmde[0,:]  = 2*dmde[1,:]  - dmde[2,:]
     dmde[-1,:] = 2*dmde[-2,:] - dmde[-3,:]
 
+    # Alternative for spherical earth
+    #phi0 = gmap.lat_ts*np.pi/180.0
+    #R = gmap.ellipsoid.a
+    #dndx = - (Xrho - gmap.xp)*gmap.dx / (pn**2 * R**2 * (1+np.sin(phi0)))
+    #dmde = - (Yrho - gmap.yp)*gmap.dx / (pm**2 * R**2 * (1+np.sin(phi0)))
+
     # save the coefficients
     nc.variables['dndx'][:,:] = dndx
     nc.variables['dmde'][:,:] = dmde

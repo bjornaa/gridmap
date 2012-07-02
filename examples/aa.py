@@ -29,7 +29,7 @@ print "Lm, Mm = ", gmap.Lm, gmap.Mm
 pn = f.variables['pn'][:,:]
 pm = f.variables['pm'][:,:]
 dndx = f.variables['dndx'][:,:]
-dmde = f.variables['dndx'][:,:]
+dmde = f.variables['dmde'][:,:]
 
 lon   = f.variables['lon_rho'][:,]
 lon_u = f.variables['lon_u'][:,:]
@@ -44,21 +44,39 @@ i, j = 4, 7
 
 # Explicit differencing
 pm0 = 1.0 / dist(lon_u[j,i+1], lat_u[j,i+1], lon_u[j,i], lat_u[j,i])
-#pn0 = 1.0 / dist(lon_v[j+1,i], lat_v[j+1,i], lon_v[j,i], lat_v[j,i])
+pn0 = 1.0 / dist(lon_v[j+1,i], lat_v[j+1,i], lon_v[j,i], lat_v[j,i])
 
 pm1 = gmap.map_scale(float(i),float(j)) / gmap.dx
-#pm2 = 1.0 / (gmap.map_scale(i,j) * gmap.dx)
+
 
 
 
 print "lon, lat = ", lon[j,i], lat[j,i]
-print "pm   = ", pm[j,i], pm0, pm1
 
-print "1/pm = ", 1.0/pm[j,i], 1.0/pm0, 1.0/pm1
-print [1.0/v for v in [pm[j+1,i], pm[j-1,i], pm[j,i-1], pm[j,i+1]]]
-print [1.0/v for v in [pm[j+1,i+1], pm[j-1,i-1], pm[j+1,i-1], pm[j-1,i+1]]]
+print ""
+
+print "1/pm   = ", 1/pm[j,i]
+print "1/pm1  = ", 1/pm1
+print "1/pn0, 1/pm0 = ", 1/pm0, 1/pn0
+
+print ""
+
+print "dndx = ", dndx[j,i]
 
 
+print "diff = ", 0.5/pn[j,i+1]-0.5/pn[j,i-1]
 
+R = gmap.ellipsoid.a
+phi0 = gmap.lat_ts*rad
 
+m = gmap.map_scale(i,j)
+
+dx = gmap.dx
+
+x = (i - gmap.xp)*gmap.dx
+
+A = - (1/m**2)  * 1 / (R*R*(1+sin(phi0))) * x * dx * dx
+
+print "A = ", A / dx
+print "A / dndx = ", A/dndx[j,i]
 

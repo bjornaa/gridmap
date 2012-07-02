@@ -17,7 +17,27 @@ North Pole to the projected point is given by:
 
 Taking differentials gives
 
-.. math:: dr = - \frac{R}{r_0}{1 + \sin \phi} d\phi
+.. math:: dr = - \frac{r_0}{1 + \sin \phi} d\phi = 
+               - \frac{r}{\cos \phi}  d\phi
+
+Introduce the map factor :math:`m` by 
+
+.. math:: dr = -m R d\phi
+
+or explicitly,
+
+.. math:: m = \frac{r_0}{R(1+\sin \phi)} 
+            = \frac{r}{R \cos \phi}
+
+The scale factor :math:`r_0` can be determined by requiring true scale
+at latitude :math:`\phi_0`, i.e. :math:`m(\phi_0) = 1` or
+
+.. math:: r_0 = R (1 + \sin \phi_0)
+
+This throws out the earth radius, giving the expression
+
+.. math:: m = \frac{1 + \sin \phi_0}{1 + \sin \phi}
+
 
 The standard spherical metric is
 
@@ -29,48 +49,38 @@ In the projected plane this becomes
 .. math:: g = R^2 \cos^2 \phi d\lambda \otimes d\lambda
              + \frac{R^2}{r_0^2} (1 + \sin \phi)^2 dr \otimes dr
 
-Using Cartesian coordinates :math:`x`, :math:`y` in the projected
-plane, we have differential relations for polar coordinates
 
-.. math:: dr = \frac{x}{r} dx + \frac{y}{r} dy, \\
-          d\lambda = - \frac{y}{r} dx + \frac{x}{r} dy
+.. math:: g = \frac{1}{m^2} 
+              (r^2 d\lambda \otimes dlambda + dr \otimes dr)
 
-This gives
+.. math:: g = \frac{1}{m^2}(dx \otimes dx + dy \otimes dy)
 
-.. math:: g = \frac{1}{m^2} dx \otimes dx + \frac{1}{n^2} dy \otimes dy
-
-with metric coeffients
-
-.. math:: m = n = \frac{r_0}{R (1 + \sin \phi)}
 
 The lack of cross term shows that this is an `orthogonal` coordinate
-system, and :math:`m=n` shows that it is `conformal`
-(angle-preserving).  The scale factor :math:`r_0` can be determined by
-requiring true scale at latitude :math:`\phi_0`, i.e. :math:`m(\phi_0) = 1` or
+system and the same metric coefficient for both terms shows that it is
+`conformal` (angle-preserving).  
 
-.. math:: r_0 = R (1 + \sin \phi_0)
+.. math:: dm = \frac{1}{r_0 R} rdr = \frac{1}{r_0 R}(xdx + ydy)
 
-This throws out the earth radius, giving the expression
+.. math:: d(\frac{1}{m}) = - \frac{1}{m^2} dm
+          = -\frac{1}{m^2 r_0 R} (xdx + ydy)
 
-.. math:: m = \frac{1 + \sin \phi_0}{1 + \sin \phi}
 
-For computations in the orhogonal coordinates systems, the partial
-derivatives :math:`m_y` and :math:`n_x` are needed. They are the
-terms ``dmde`` and ``dndx`` in ROMS.
+The ROMS terms, 
 
-.. math:: d\frac{1}{m} = 
-      - \frac{R}{r_0} \frac{\cos^2 \phi}{(1+\sin \phi)^2} dr
-      = \frac{R}{r_0 m^2} (xdx + ydy)
-            
-(mellomledd er feil) This gives 
+.. math:: ``pm`` = ``pn`` = \frac{m}{\Delta x}
 
-.. math:: \frac{\partial m^{-1}}{\partial x} = \frac{R x}{r_0 m^2} 
-          = \frac{x(1 + \sin \phi)^2}{(1 + \sin \phi_0)^3}
+.. math:: ``dndx`` 
+       =  \frac{\partial}{\partial x} \left( \frac{1}{m} \right)
+       =  - \frac{x}{m^2 R^2 (1 + \sin \phi_0)}
 
-and
+In computer code:: 
+  
+  pm = PolarStereographic.map_scale(Xrho, Yrho) / dx
+  pn = pm
+  dndx = - (Xrho - xp)*dx / (pn**2 * R**2 * (1+np.sin(phi0)))
+  dmde = - (Yrho - yp)*dx / (pm**2 * R**2 * (1+np.sin(phi0)))
 
-.. math:: \frac{\partial n^{-1}}{\partial x} = 
-          \frac{\partial m^{-1}}{\partial x} = \frac{R y}{r_0 m^2}
 
 
 The general ellipsoid case
