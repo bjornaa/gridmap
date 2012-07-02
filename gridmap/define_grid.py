@@ -308,7 +308,8 @@ def create_grid(gmap, grid_name, file_name):
     # Metric coefficients
     # ----------------------
     
-    pm = 1.0 / (gmap.map_scale(Xrho, Yrho) * gmap.dx)
+    #pm = 1.0 / (gmap.map_scale(Xrho, Yrho) * gmap.dx)
+    pm = gmap.map_scale(Xrho, Yrho) / gmap.dx
     pn = pm
     nc.variables['pm'][:,:] = pm
     nc.variables['pn'][:,:] = pn
