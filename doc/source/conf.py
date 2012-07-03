@@ -33,7 +33,6 @@ extensions = [#'matplotlib.sphinxext.mathmpl',
               'sphinx.ext.doctest',
               'sphinx.ext.mathjax',
               #'ipython_console_highlighting',
-              #'inheritance_diagram',
               #'numpydoc',
              ]
 

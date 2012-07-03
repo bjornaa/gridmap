@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*
 
-"""Defines grid mappings, between longitude, latitude and grid coordinates"""
+"""Module for grid mappings for ROMS grid files
+"""
 
 from numpy import pi, sqrt, sin, cos, tan, arctan, arctan2
 try:
@@ -10,7 +11,7 @@ except:
     has_basemap = False
 
 all = ['Ellipsoid', 'Sphere', 'sphere', 'WGS84', 
-       'PolarStereographic', 'gridmap_fromfile']
+       'PolarStereographic', 'fromfile']
 
 deg = 180.0 / pi
 rad = pi / 180.0
@@ -23,7 +24,14 @@ class Ellipsoid(object):
 
     """Earth ellipsoids"""
 
-    def __init__(self, a, invf=None, name='general'):
+    def __init__(self, a, invf=None):
+        """Ellipsoid parameters
+
+           a : major semi-axis [m]
+           invf : optional, inverse flattening
+                  defailt None for sphere
+
+        """
         self.a = a                        # major semi-axis [m]
         self.invf = invf                  # inverse flattening
         if invf == None:    # sphere case
@@ -32,15 +40,14 @@ class Ellipsoid(object):
             self.f = 1.0 / invf           
         self.e = sqrt((2-self.f)*self.f)  # eccentrity
         self.b = a*(1-self.f)             # minor semi-axis [m]
-        self.name = name
 
 class Sphere(Ellipsoid):
     def __init__(self, radius=6371000.0):  # met.no default
-        Ellipsoid.__init__(self, a=radius, name='Sphere')
+        Ellipsoid.__init__(self, a=radius)
                 
 # Common instances
 sphere = Sphere()   # default radius
-WGS84  = Ellipsoid(a=6378137.0, invf=298.257223563, name='WGS84')
+WGS84  = Ellipsoid(a=6378137.0, invf=298.257223563)
 
 # -------------------------------------
 # Polar Stereographic grid map class
@@ -140,10 +147,10 @@ class PolarStereographic(object):
     def _proj4string(self):
         proj = "+proj=stere"
         ellipsoid = self.ellipsoid
-        if ellipsoid.name == 'WGS84':
-            ellps = "+ellps=WGS84" 
-        else:
+        if ellipsoid.invf == None:  # sphere
             ellps = "+R=" + str(self.ellipsoid.a)
+        else:  # only other case is WGS84
+            ellps = "+ellps=WGS84" 
         lat_0 = "+lat_0=90"
         lon_0 = "+lon_0=" + str(self.ylon)
         x_0 = "+x_0=" + str(self.xp*self.dx)
@@ -152,16 +159,15 @@ class PolarStereographic(object):
         projlist = [proj, ellps, lat_0, lat_ts, x_0, y_0, lon_0]
         return " ".join(projlist)
 
-    
     if has_basemap:
         def basemap(self, resolution='i', area_thresh=None):
 
             # Check ellipsoid
             ellipsoid = self.ellipsoid
-            if ellipsoid.name == 'WGS84':
-                rsphere = (ellipsoid.a, ellipsoid.b)
-            else:
+            if ellipsoid.invf == None:  # sphere case
                 rsphere = ellipsoid.a
+            else:                       # ellipsoid case
+                rsphere = (ellipsoid.a, ellipsoid.b)
 
             if area_thresh == None:
                 # Default = half grid cell area
@@ -182,9 +188,7 @@ class PolarStereographic(object):
                            rsphere=rsphere,
                            lat_0 = 90.0, lon_0 = self.ylon,
                            lat_ts = self.lat_ts)
-
         
-
 # -------------
 
 def fromfile(nc, var='h'):
@@ -227,12 +231,4 @@ def fromfile(nc, var='h'):
     return PolarStereographic(xp, yp, dx, ylon,
                 Lm=Lm, Mm=Mm, lat_ts=lat_ts, ellipsoid=ellipsoid)
 
-
-
-
-    
-    
-   
-             
-    
 

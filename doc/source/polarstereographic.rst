@@ -89,7 +89,8 @@ equatorial radius (major semiaxis) :math:`a` and  polar radius
 (minor semiaxis) :math:`b`. The flattening :math:`f` and eccentricity
 :math:`e` are defined by:
 
-.. math:: f = 1 - \frac{b}{a}, \quad e = 1 - \frac{b^2}{a^2} = 2f - f^2
+.. math:: f = 1 - \frac{b}{a}, \quad 
+          e^2 = 1 - \frac{b^2}{a^2} = 2f - f^2
 
 Two ellipsoids are available, the *sphere* with default radius
 :math:`a = b = R = 6371000` m, or the *WGS84* ellipsoid defined by
