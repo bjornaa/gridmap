@@ -41,45 +41,43 @@ This throws out the earth radius, giving the expression
 
 The standard spherical metric is
 
-.. math:: g = R^2 \cos^2 \phi d\lambda \otimes d\lambda
-             + R^2 d\phi \otimes d\phi
-
-In the projected plane this becomes
-
-.. math:: g = R^2 \cos^2 \phi d\lambda \otimes d\lambda
-             + \frac{R^2}{r_0^2} (1 + \sin \phi)^2 dr \otimes dr
-
-
-.. math:: g = \frac{1}{m^2} 
-              (r^2 d\lambda \otimes dlambda + dr \otimes dr)
-
-.. math:: g = \frac{1}{m^2}(dx \otimes dx + dy \otimes dy)
+.. math:: g &= R^2 \cos^2 \phi d\lambda \otimes d\lambda
+             + R^2 d\phi \otimes d\phi                     \\
+            &= R^2 \cos^2 \phi d\lambda \otimes d\lambda
+             + \frac{R^2}{r_0^2} (1 + \sin \phi)^2 dr \otimes dr \\
+            &= \frac{1}{m^2} 
+              (r^2 d\lambda \otimes d\lambda + dr \otimes dr)    \\
+            &= \frac{1}{m^2}(dx \otimes dx + dy \otimes dy)
 
 
 The lack of cross term shows that this is an `orthogonal` coordinate
 system and the same metric coefficient for both terms shows that it is
-`conformal` (angle-preserving).  
+`conformal` (angle-preserving). ROMS needs the derivatives of the inverse
+map factor.
 
 .. math:: dm = \frac{1}{r_0 R} rdr = \frac{1}{r_0 R}(xdx + ydy)
 
 .. math:: d(\frac{1}{m}) = - \frac{1}{m^2} dm
-          = -\frac{1}{m^2 r_0 R} (xdx + ydy)
+          = -\frac{1}{r_0 R m^2} (xdx + ydy)
 
 
-The ROMS terms, 
+.. math::  \frac{\partial}{\partial x} \left( \frac{1}{m} \right)
+                   =  - \frac{x}{r_0 R m^2}, \quad
+           \frac{\partial}{\partial y} \left( \frac{1}{m} \right)
+                   =  - \frac{y}{r_0 R m^2}, \quad
 
-.. math:: ``pm`` = ``pn`` = \frac{m}{\Delta x}
+In python code::
 
-.. math:: ``dndx`` 
-       =  \frac{\partial}{\partial x} \left( \frac{1}{m} \right)
-       =  - \frac{x}{m^2 R^2 (1 + \sin \phi_0)}
-
-In computer code:: 
-  
-  pm = PolarStereographic.map_scale(Xrho, Yrho) / dx
-  pn = pm
-  dndx = - (Xrho - xp)*dx / (pn**2 * R**2 * (1+np.sin(phi0)))
-  dmde = - (Yrho - yp)*dx / (pm**2 * R**2 * (1+np.sin(phi0)))
+  import numpy as np 
+  ...
+  r = np.sqrt((i-xp)**2 + (j-yp)**2)
+  r0 = R * (1+np.sin(phi0))
+  ...
+  pm[j,i] = r / (R * np.cos(phi[j,i]) * dx)
+  pn[j,i] = pm[j,i]
+  ...
+  dndx[j,i] = (xp-i)*dx / (r0 * R * pn[j,i]**2)
+  dmde[j,i] = (yp-j)*dx / (r0 * R * pm[j,i]**2)
 
 
 

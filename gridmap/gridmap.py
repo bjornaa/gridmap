@@ -20,6 +20,9 @@ rad = pi / 180.0
 # -------------------------
 
 class Ellipsoid(object):
+
+    """Earth ellipsoids"""
+
     def __init__(self, a, invf=None, name='general'):
         self.a = a                        # major semi-axis [m]
         self.invf = invf                  # inverse flattening
