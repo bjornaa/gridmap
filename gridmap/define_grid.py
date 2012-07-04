@@ -174,7 +174,7 @@ def create_grid(gmap, grid_name, file_name):
     v = nc.createVariable(gridmap_varname, 'i', ())
     v.long_name = "grid mapping"
     v.grid_mapping_name = "polar_stereographic"
-    if gmap.ellipsoid == 'WGS84':
+    if gmap.ellipsoid.invf: # Not sphere => WGS84
         v.ellipsoid = 'WGS84'
         v.semi_major_axis = gmap.ellipsoid.a
         v.inverse_flattening = gmap.ellipsoid.invf

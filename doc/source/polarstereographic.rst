@@ -92,9 +92,40 @@ equatorial radius (major semiaxis) :math:`a` and  polar radius
 .. math:: f = 1 - \frac{b}{a}, \quad 
           e^2 = 1 - \frac{b^2}{a^2} = 2f - f^2
 
-Two ellipsoids are available, the *sphere* with default radius
+The two ellipsoids commonly used are the *sphere* with default radius
 :math:`a = b = R = 6371000` m, or the *WGS84* ellipsoid defined by
 :math:`a=6378137` m and :math:`f=1/298.257223563`.
+
+The geometric projection from the South Pole to a plane intersecting
+the ellipsoid at constant latititude :math:`\phi_0` will work, but is
+not a *conformal* mapping. Instead the stereographic projection is
+defined by
+
+.. math:: r = r_0 \frac{\cos \phi}{1+\sin \phi}E(\phi)
+            = r_0 \frac{\cos \chi}{1+\sin \chi}
+
+where :math:`E` is a correction term
+
+.. math:: E = \left( \frac{1-e\sin \phi}
+                          {1+e\sin \phi} \right)^{\frac{e}{2}} 
+
+and :math:`\chi = \chi(\phi)` is the *conformal* latitude.
+
+.. math:: \chi = \frac{\pi}{2} 
+      - 2 \arctan \left( \frac{E(\phi) \cos \phi}{1 + \sin \phi} \right )
+
+The length element along a meridian is
+
+.. math:: dS = \frac{a(1-e^2)}{(1-e^2\sin^2 \phi)^{3/2}} d\phi
+
+and the map conversion factor is defined by
+
+.. math:: dr = m dS, \quad \text{or} \quad m = ...
+
+The requirement of true scale at :math:`\phi_0` gives
+
+.. math:: r_0 = 
+
 
 
 The projection is an *azimuthal* projection best described with polar
@@ -113,12 +144,13 @@ projection of this kind. For an ellipsoid the projection is given by
                   \left( \frac{1+e\sin \phi}
                             {1-e\sin \phi} \right)^{\frac{e}{2}} 
 
-To obtain true scale at latitude :math:`\phi_c`, the scale factor :math:`\rho_0` is given by
+To obtain true scale at latitude :math:`\phi_c`, the scale factor
+:math:`r_0` is given by
 
-.. math::  \rho_0 =  a \frac{\cos \phi_c}{\sqrt{1-e^2\sin^2 \phi_c}}
-                    \tan \left( \frac{\pi}{4}+\frac{\phi_c}{2} \right)
-                  \left( \frac{1-e\sin \phi_c}
-                              {1+e\sin \phi_c} \right)^{\frac{e}{2}} 
+.. math:: r_0 =  a \frac{1 + \sin \phi_0}{\sqrt{1 - e^2 \sin^2 \phi_0}}
+                   E(\phi_0)^{-1}
+  
+--- gammel tekst ---
    
 For an ellipsoid this is impossible to invert analytically. The
 inverse can be found by iteration (as done in *proj4*) or by the
@@ -143,21 +175,6 @@ where :math:`\chi` is the *conformal* latitude given by
 With :math:`\phi_c = 60^{\circ}\mathrm{N}` the error for station M with
 longitude :math:`\phi = 66^{\circ}\mathrm{N}` the error is ...
 
-For a sphere, the conformal latitude and the ordinary latitude are
-equal and the projection simplifies to 
-
-.. math:: \rho(\phi) =  \rho_0 
-            \tan \left( \frac{\pi}{4} - \frac{\phi}{2} \right)
-             = \rho_0 \frac{\cos \phi}{1 + \sin \phi}
-
-with
-
-.. math:: \rho_0 = a \cos \phi_c 
-             \tan \left( \frac{\pi}{4} + \frac{\phi_c}{2} \right)
-	     = a (1 + \sin \phi_c)  
-
-and has a simple geometric interpretation as a projection from the
-South pole onto the plane at the true latitude :math:`\phi_c`.
 
 For more info on map projections, a standard reference is
 Snyder(1987) 

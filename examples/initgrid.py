@@ -12,17 +12,18 @@ import gridmap
 # Polar stereographic map projection
 xp, yp, dx, ylon = 418.25, 257.25, 10000, 58
 # Uncomment the following line for WGS84 ellipsoid
-#ellipsoid = 'WGS84'
+ellipsoid = 'WGS84'
 
 # Number of internal grid cells
 # deliberately small numbers for the demo
 Lm, Mm = 100, 75
 
 # Name of grid
-grid_name = "demo10km"
+#grid_name = "demo10km"
+grid_name = "demo10km_WGS84"
 
 # Name of grid file
-file_name = grid_name + "_grd.nc"
+file_name = grid_name + "_grid.nc"
 
 # -----------------------------------
 
