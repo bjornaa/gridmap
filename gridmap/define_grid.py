@@ -125,7 +125,7 @@ def create_grid(gmap, grid_name, file_name):
     v.standard_name = "angle_of_rotation_from_east_to_x"
     v.units = "radian"
     v.coordinates = "lon_rho lat_rho"
-    v.mapping = gridmap_varname
+    v.grid_mapping = gridmap_varname
 
     # Note: use spherical even if WGS84 ellipsoid
     # the alternative is cartesian without metric terms
@@ -141,28 +141,28 @@ def create_grid(gmap, grid_name, file_name):
     v.units = "meter-1"
     v.field = "pm, scalar"
     v.coordinates = "lon_rho lat_rho"
-    v.mapping = gridmap_varname
+    v.grid_mapping = gridmap_varname
 
     v = nc.createVariable('pn', 'd', ('eta_rho', 'xi_rho'))
     v.long_name = "curvilinear coordinate metric in ETA"
     v.units = "meter-1"
     v.field = "pn, scalar"
     v.coordinates = "lon_rho lat_rho"
-    v.mapping = gridmap_varname
+    v.grid_mapping = gridmap_varname
 
     v = nc.createVariable('dndx', 'd', ('eta_rho', 'xi_rho'))
     v.long_name = "xi derivative of inverse metric factor pn"
     v.units = "meter"
     v.field = "dndx, scalar"
     v.coordinates = "lon_rho lat_rho"
-    v.mapping = gridmap_varname
+    v.grid_mapping = gridmap_varname
 
     v = nc.createVariable('dmde', 'd', ('eta_rho', 'xi_rho'))
     v.long_name = "eta derivative of inverse metric factor pm"
     v.units = "meter"
     v.field = "pn, scalar"
     v.coordinates = "lon_rho lat_rho"
-    v.mapping = gridmap_varname
+    v.grid_mapping = gridmap_varname
 
     # --- Grid map
 
@@ -197,7 +197,7 @@ def create_grid(gmap, grid_name, file_name):
     v.units = "meter" 
     v.field = "bath, scalar"
     v.coordinates = "lon_rho lat_rho"
-    v.mapping = gridmap_varname
+    v.grid_mapping = gridmap_varname
 
     v = nc.createVariable('h', 'd', ('eta_rho', 'xi_rho'))
     v.long_name = "Final bathymetry at RHO-points"
@@ -205,7 +205,7 @@ def create_grid(gmap, grid_name, file_name):
     v.units = "meter"
     v.field = "bath, scalar"
     v.coordinates = "lon_rho lat_rho"
-    v.mapping = gridmap_varname
+    v.grid_mapping = gridmap_varname
 
     # --- Coriolis
 
@@ -215,7 +215,7 @@ def create_grid(gmap, grid_name, file_name):
     v.units = 'second-1'
     v.field = 'Coriolis, scalar'
     v.coordinates = "lon_rho lat_rho"
-    v.mapping = gridmap_varname
+    v.grid_mapping = gridmap_varname
 
     # --- Masks 
 
@@ -225,21 +225,21 @@ def create_grid(gmap, grid_name, file_name):
     v.option_0 = "land" 
     v.option_1 = "water" 
     v.coordinates = "lon_rho lat_rho"
-    v.mapping = gridmap_varname
+    v.grid_mapping = gridmap_varname
 
     v = nc.createVariable ('mask_u', 'd', ('eta_u', 'xi_u'))
     v.long_name = "mask on U-points" 
     v.option_0 = "land" 
     v.option_1 = "water" 
     v.coordinates = "lon_u lat_u"
-    v.mapping = gridmap_varname
+    v.grid_mapping = gridmap_varname
 
     v = nc.createVariable('mask_v', 'd', ('eta_v', 'xi_v'))
     v.long_name = "mask on V-points" 
     v.option_0 = "land" 
     v.option_1 = "water" 
     v.coordinates = "lon_v lat_v"
-    v.mapping = gridmap_varname
+    v.grid_mapping = gridmap_varname
 
     v = nc.createVariable('mask_psi', 'd', ('eta_psi', 'xi_psi'))
     v.long_name = "mask on PSI-points" 

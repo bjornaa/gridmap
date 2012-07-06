@@ -207,12 +207,15 @@ def fromfile(nc, var='h'):
 
     Typical usage: 
     >>> nc = NetCDF4.Dataset(roms_grid_file)
-    >>> gmap = gridmap_fromfile(nc)
+    >>> gmap = gridmap_fromfile(nc)u
 
     """
 
     # Legge til fornuftig feilkontroll
-    grid_mapping_variable = nc.variables[var].mapping
+    #print "nc = ", nc
+    #print "var = ", var
+    #print "nc.variables[var] = ", nc.variables[var]
+    grid_mapping_variable = nc.variables[var].grid_mapping
     v = nc.variables[grid_mapping_variable]
     # 
     if v.ellipsoid == 'WGS84':
