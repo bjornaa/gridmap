@@ -44,64 +44,106 @@ class test_GridGeneration_sphere(unittest.TestCase):
 
 
 
-#    def tearDown(self):
-#        """Remove the grid file"""
-#        os.remove(self.file_name)
+    def tearDown(self):
+        """Remove the grid file"""
+        os.remove(self.file_name)
 
 
-    def test_angle(self):
-        """Angle variable is OK"""
 
+
+    def test_metric(self):
+        """Check the (geo)metric variables
+
+        They should agree with finite difference approximation
+        as done in Kate Hedstrom's gridpak.
+        They should agree with analytical formulation for
+        the polar stereographic map projection
+
+        Presently the test only applies to the spherical case
+        """
+
+        # Take an "arbitrary" grid cell
         i, j = 4, 3
-        f = Dataset(self.file_name)
-        # Compute angle variable by differencing
-        # like Kate Hedstrom's  gridpak
-        pass
 
-    def test_pm(self):
-        """pm and pn are OK"""
-        i, j = 4, 3
-        f = Dataset(self.file_name)
+        # Read the grid file
+        f = Dataset(self.file_name)       
         gmap = gridmap.fromfile(f)
+        angle = f.variables['angle'][:,:]
         pm = f.variables['pm'][:,:]
         pn = f.variables['pn'][:,:]
+        dmde = f.variables['dmde'][:,:]
+        dndx = f.variables['dndx'][:,:]
+        lon_rho = f.variables['lon_rho'][:,:]
         lon_u = f.variables['lon_u'][:,:]
         lat_u = f.variables['lat_u'][:,:]
         lon_v = f.variables['lon_v'][:,:]
         lat_v = f.variables['lat_v'][:,:]
         f.close()
 
-        # Difference formulation, using spherical distance
+        # Compute angle variable by differencing
+
+        # U-points
+        a1 = lat_u[j,i+1] - lat_u[j,i]
+        a2 = lon_u[j,i+1] - lon_u[j,i]
+        #a2 = np.where(a2 < -180., a2+360., a2)
+        #a2 = np.where(a2 > +180., a2-360., a2)
+        a2 = a2 * cos(0.5*(lat_u[j,i+1] + lat_u[j,i])*rad)
+        angle_u = np.arctan2(a1,a2)
+
+        # V-points
+        a2 = lat_v[j,i] - lat_v[j+1, i]
+        a1 = lon_v[j,i] - lon_v[j+1, i]
+        #a1 = np.where(a1 < -180., a1+360., a1)
+        #a1 = np.where(a1 > +180., a1-360., a1)
+        a1 = a1 * cos(0.5*(lat_v[j,i] + lat_v[j+1,i])*rad)
+        angle_v = np.arctan2(a1, -a2)
+
+        # Average
+        angle0 = 0.5*(angle_u + angle_v)
+
+        # pn, pm with difference formulation, using spherical distance
         pm0 = 1.0 / dist(lon_u[j,i+1], lat_u[j,i+1], lon_u[j,i], lat_u[j,i])
         pn0 = 1.0 / dist(lon_v[j+1,i], lat_v[j+1,i], lon_v[j,i], lat_v[j,i])
 
-        # Analytical from map_scale
-        pm1 = gmap.map_scale(float(i),float(j)) / gmap.dx
+        # Central diffence formulation
+        dndx0 = 0.5*(1/pn[j,i+1]-1/pn[j,i-1])
+        dmde0 = 0.5*(1/pm[j+1,i]-1/pm[j-1,i])
+
+        # Analytical expressons
+
+        R = gmap.ellipsoid.a
+        phi0 = gmap.lat_ts * rad
+        m = gmap.map_scale(i,j)
+        dx = gmap.dx
+        x = (i - gmap.xp)*dx
+        y = (j - gmap.yp)*dx
+        A = - dx**2 / (m**2 * R**2 * (1+sin(phi0)))
+
+        angle1 = (gmap.ylon - lon_rho[j,i])*rad
+        pm1 = m / dx
+        dndx1 = x * A
+        dmde1 = y * A
+
+        # Testing
+        # Note: should work with variables saved as both
+        #   float32 and float64 (only tested 64)
+        self.assertAlmostEqual(angle[j,i], angle_u, places=2)
+        self.assertAlmostEqual(angle[j,i], angle_v, places=2)
+        self.assertAlmostEqual(angle[j,i], angle0, places=3)
+        self.assertAlmostEqual(angle[j,i], angle1)
 
         self.assertAlmostEqual(pm[j,i], pm0, places=6)
         self.assertAlmostEqual(pn[j,i], pn0, places=6)
-        # Do not expect equality if variables saved as float32
-        self.assertEqual(pm[j,i], pm1)
-        self.assertEqual(pn[j,i], pm1)
-    
-    def test_dmde(self):
-        """dmde and dndx are OK"""
+        self.assertAlmostEqual(pm[j,i], pm1)
+        self.assertAlmostEqual(pn[j,i], pm1)
+
+        self.assertAlmostEqual(dndx[j,i], dndx0)
+        self.assertAlmostEqual(dmde[j,i], dmde0)
+        self.assertAlmostEqual(dndx[j,i], dndx1, places=5)
+        self.assertAlmostEqual(dmde[j,i], dmde1, places=5)
 
 
-        # Hent kode fra examples/aa.py
-        #   som kan slettes etterpå
-        i, j = 4, 3
-        f = Dataset(self.file_name)
-        gmap = gridmap.fromfile(f)
-        pm = f.variables['pm'][:,:]
-        pn = f.variables['pn'][:,:]
-        lon_u = f.variables['lon_u'][:,:]
-        lat_u = f.variables['lat_u'][:,:]
-        lon_v = f.variables['lon_v'][:,:]
-        lat_v = f.variables['lat_v'][:,:]
-        f.close()
-
-
+         
     def test_fromfile(self):
         """Testing that fromfile recreates the grid map object"""
         f = Dataset(self.file_name)
