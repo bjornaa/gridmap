@@ -1,6 +1,6 @@
-========================================
-Polarsterographic grids in other systems
-========================================
+=======================================================
+Handling Polar Stereographic grids in different systems
+=======================================================
 
 Reading the parameters from file
 ================================
@@ -64,7 +64,7 @@ shell
 The ``bash``-shell does not have a shell NetCDF reader. But the
 information can be gained from the CDL-file created by ``ncdump``.
 The grid size can be found from the dimension settings and the
-stereographic parametere from the grid mapping variable::
+stereographic parametere from the grid mapping variable
 
   ncdump -h $GRIDFILE > $CDL_FILE
   ...
@@ -77,47 +77,147 @@ stereographic parametere from the grid mapping variable::
 
 
 
+Computing grid coordinates
+==========================
+
+Here a standardized example is used. A grid mapping for the Arctic is
+defined by ``xp`` = 418.25, ``yp`` = 257.25, ``dx`` = 10000, and
+``ylon`` = 58 on a spherical earth (radius=6371km). These parameters can
+be read from the file ``demo10km_grid.nc`` as above or given
+explicitly. The projection does not depend on the grid size, so
+``Lm``, ``Mm`` are left undefined.
+
+The different systems are used to compute the grid coordinates of
+station M (2°E, 66°N). The correct values (as computed by proj4) are::
+
+  x = 208.754891658 
+  y = 115.943765186 
+
+The `inverse` or `backwards` projection is used to find the location
+of the origin (rho-point in lower left grid cell, x=0, y=0). Here the
+authorative values from proj4 are::
+
+  lon = -0.405875241137
+  lat = 45.2201521896
 
 
+python with gridmap
+-------------------
 
+The ``Gridmap`` package for python is partly designed for this
+purpose. The code is::
+
+  import gridmap
+  ...
+  gmap = gridmap.PolarStereographic(xp, yp, dx, ylon)
+  ...
+  lon, lat = 2, 66
+  x, y = gmap.ll2grid(lon, lat)
+  ...
+  x, y = 0, 0
+  lon, lat = gmap.grid2ll(x, y)
+
+With the numbers of decimals above, the results are identical to the
+proj4 control values.
 
 proj4
-=====
+-----
 
 Proj4 http://trac.osgeo.org/proj/ is perhaps the standard software for
 map projections offering a wealth of projections and ellipsoids.
 
-A mapping with values for XP, YP, DX, YLON can be 
-be recreated in a shell script by::
+proj4 from shell
+................
 
-  XPDX=$(echo "($XP*$DX)" | bc)
+Proj4 comes with a command line program ``proj`` that can be used from
+the shell to do projections. A polar stereographic mapping with values
+for ``XP``, ``YP``, ``DX``, ``YLON`` on a spherical earth is specified
+by::
+
+  XPDX=$(echo "($XP*$DX)" | bc)   # multiply floats XP and DX
   YPDX=$(echo "($YP*$DX)" | bc)
   proj -m 1:$DX +proj=stere +R=6371000 +lat_0=90 +lat_ts=60 +x_0=$XPDX +y_0=$YPDX +lon_0=$YLON
 
-This is for a spherical earth. For the WGS84 ellipsoid use::
+Here the option ``-m 1:$DX`` scales the output to directly to grid
+coordinates. In the WGS84 case, the option ``+R=637100`` is replaced by 
+``+ellps=WGS84``. 
 
-  proj -m 1:$DX +proj=stere +ellps=WGS84 +lat_0=90 +lat_ts=60 +x_0=$XPDX +y_0=$YPDX +lon_0=$YLON
+The input is taken from a file, or as done here, a ``here`` construct
+in the shell.
 
-An example can be found in the shell script `project_proj4.sh`
+The inverse projection is done by the option ``-I`` or the command 
+``invproj`` with the same options. 
 
-proj4string
------------
+When a grid file is available, the ``proj4string`` simplifies the
+script, providing the options and eliminates the complicated
+multiplication of floating points numbers in the shell. The usage is
+then simply::
 
-The use of proj is greatly simplified by projstrings containing all
-the arguments. Such a string is
-provided in the ROMS grid files adhering the standard here
-and can be found by::
- 
-  ncdump -h $GRIDFILE | grep projstring
+  PROJ4STRING=`ncdump -h $GRIDFILE | grep proj4string`
+  $PROJ $PROJ4STRING
 
-Using python with the gridmap package, the projstring can be found
-by::
+Note, as the option ``-m`` is not used, the results are
+unscled and has to be divided by ``DX``.
+[test at dette virker]
 
-  gmap = gridmap.PolarStereographic(xp, yp, dx, ylon, ...)
-  gmap.projstring
+
+
+proj4 from python
+-----------------
+
+Proj4 can be run from a python script instead of the shell. This
+offers some advantages. It is system independent and can even be used
+on systems like Microsoft Windows which does not come with a standard
+shell. [Test dette] It uses a real programming language and can be
+integrated with other packages like ``gridmap``. The ``subprocess``
+module from the python standard library gives complete control of the
+``proj`` program.
+
+The example script ``project_proj4.py`` provides two functions
+``proj`` and ``invproj`` handling the subprocess details. The
+``PolarStereographic`` class in ``gridmap`` has an attribute
+``proj4string`` which contains the projection options (the ones with
+plusses). The use is as simple as::
+
+  gmap = gridmap.PolarStereographic(xp, yp, dx, ylon)
+  x, y = proj(gmap.proj4string, lon, lat)
+  x, y = x/dx, y/dx
+
+Note that the ``proj`` function is meant to be general for the use of proj4,
+not only for polar stereographic grids it does not do the scaling to
+grid coordinates. 
+
 
 GMT
 ===
+
+The generic mapping tools ``GMT`` (ref) is a much used package for map
+projections and plotting. It is independent of proj4 and implements
+the map projections separately. It is usually used from the shell, but
+similarly to proj4, usage from python is recommended. Also for GMT the
+a complicated sequence of command line options is required.
+
+The example script ``project_gmt.py`` introduces projection functions
+``proj`` and ``invproj`` [faktisk kalt ``mapproject`` using the GMT program ``mapproject`` similar
+to the proj4-functions. An example usage::
+
+  [Virker ikke for spherical earth???, feil i ellipsoid???]
+
+
+  gmap = gridmap.PolarStereographic(xp, yp, dx, ylon)
+  projection = '-Js%s/90.0/%s/1:%s' % \
+                 (str(ylon), str(gmap.lat_ts), str(100*dx))
+  ellipsoid = "--ELLIPSOID=%s" % str(gmap.ellipsoid.a)
+  extent = '-R0/1/60/61'   # Map extent, actual values are not used
+  offset = '-C%s/%s' % (str(xp), str(yp))
+  gmtstring = " ".join((ellipsoid, projection, offset, extent))
+
+  x, y = mapproject(gmtstring, lon, lat)
+
+This gives grid coordinates directly, as the scaling is part of the
+``-J``-string.
+
+[Lage en GMTstring i gridmap-pakke??]
 
 Basemap
 =======

@@ -48,8 +48,7 @@ class test_GridGeneration_sphere(unittest.TestCase):
         """Remove the grid file"""
         os.remove(self.file_name)
 
-
-
+    # ------------------------------------------------
 
     def test_metric(self):
         """Check the (geo)metric variables
@@ -142,7 +141,7 @@ class test_GridGeneration_sphere(unittest.TestCase):
         self.assertAlmostEqual(dndx[j,i], dndx1, places=5)
         self.assertAlmostEqual(dmde[j,i], dmde1, places=5)
 
-
+    # ---------------------------------------------------
          
     def test_fromfile(self):
         """Testing that fromfile recreates the grid map object"""

@@ -69,16 +69,24 @@ if __name__ == '__main__':
     # ----------------------------
 
     gmap = PolarStereographic(xp, yp, dx, ylon)
+#
+#    projection = '-V  -Js%s/90.0/%s/1:%s' % \
+#                 (str(ylon), str(gmap.lat_ts), str(100*dx))
+#                 (str(ylon), str(gmap.lat_ts), str(100*dx))
 
-    projection = '-Js%s/90.0/%s/1:%s' % \
-                 (str(ylon), str(gmap.lat_ts), str(100*dx))
+    projection = '  -Js58.0/90.0/60.0/1:1000000c'
+
+    ellipsoid = ""
     #ellipsoid = "--ELLIPSOID=Sphere"
     #ellipsoid = "--ELLIPSOID=WGS-84"
     ## Ser ut som ellipsoid er gitt på korrekt vis, men får feil
     ## Setting virker for WGS84 
-    ellipsoid = "--ELLIPSOID=%s" % str(gmap.ellipsoid.a)
+    #ellipsoid = "--ELLIPSOID=%s" % str(gmap.ellipsoid.a)
     #ellipsoid = "--ELLIPSOID=%s" % "6378137,298.257223563" # WGS84 OK
+    # Den under virker og gir WGS84
+    #ellipsoid = "--ELLIPSOID=%s%s" % ("6378137,f=", str(1/298.257223563))
     #ellipsoid = "--ELLIPSOID=%s" % "6371000,f=0"
+    #ellipsoid = "--ELLIPSOID=%s" % "6371000,b=6371000"
 
     extent = '-R0/1/60/61'   # Actual values are not used
     offset = '-C%s/%s' % (str(xp), str(yp))
@@ -86,7 +94,6 @@ if __name__ == '__main__':
 
     x0, y0 = gmap.ll2grid(lon, lat)
     x1, y1 = mapproject(gmtstring, lon, lat, verbose=True)
-
 
     print "gmt mapproject : ", x1, y1
     print "gmap.ll2grid   : ", x0, y0
@@ -99,6 +106,7 @@ if __name__ == '__main__':
     print "mapproject -I  : ", lon1, lat1
     print "gmap.grid2ll   : ", lon0, lat0
 
+    import sys; sys.exit(0)
 
     # ---------------------------
     print "\n --- WGS84 ---\n"

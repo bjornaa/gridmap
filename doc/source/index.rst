@@ -9,7 +9,7 @@ Welcome to gridmap's documentation!
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
    gridfile.rst
    gridmap.rst

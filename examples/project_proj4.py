@@ -60,7 +60,7 @@ if __name__ == '__main__':
     ylon  = 58.0          # angle of y-axis        [deg]
 
     lon, lat = 2, 66   # Station M
-    x, y = 200.0, 100.0
+    x, y = 0.0, 0.0
 
     #verbose = True
 

@@ -40,7 +40,7 @@ class test_PolarStereographic0(unittest.TestCase):
         x0, y0 = self.map0.ll2grid(lon, lat)
         self.assertEqual((x0, y0), (self.xp, self.yp))
         # WGS84
-        x1, y1 = self.map0.ll2grid(lon, lat)
+        x1, y1 = self.map1.ll2grid(lon, lat)
         self.assertEqual((x1, y1), (self.xp, self.yp))
         
     def test_north_pole_backward(self):
