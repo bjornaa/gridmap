@@ -58,6 +58,7 @@ print "\n --- WGS84 --- \n"
 a = 6378137.0
 f = 1./298.257223563
 b = a*(1-f)
+print b
 
 # Projection in basemap
 bmap = Basemap(projection='stere', rsphere=(a, b),

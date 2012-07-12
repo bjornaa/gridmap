@@ -14,6 +14,7 @@ CF-standard. It can be found from the attribute
 ``grid_mapping`` of the ``h``-variable. To simplify, it is assumed
 here that the variable is simply called ``grid_mapping``
 
+
 Python with netCDF4-python
 --------------------------
 
@@ -87,6 +88,21 @@ be read from the file ``demo10km_grid.nc`` as above or given
 explicitly. The projection does not depend on the grid size, so
 ``Lm``, ``Mm`` are left undefined.
 
+::
+
+  xp      |    yp    |   dx   |  ylon
+  --------+----------+--------+------
+  418.25  | 257.25   | 10000  | 58
+
+::
+
+          |  lon  |  lat  |  x            |  y
+   -------+-------+-------+---------------+--------------
+   sphere |   2   |  66   | 208.754891658 | 115.943765186 
+   -------+-------+-------+---------------+--------------
+   WGS84  |   2   |  66   | 207.924459414 | 115.383631565
+
+
 The different systems are used to compute the grid coordinates of
 station M (2°E, 66°N). The correct values (as computed by proj4) are::
 
@@ -96,6 +112,15 @@ station M (2°E, 66°N). The correct values (as computed by proj4) are::
 The `inverse` or `backwards` projection is used to find the location
 of the origin (rho-point in lower left grid cell, x=0, y=0). Here the
 authorative values from proj4 are::
+
+          |   x   |  y    |  lon            |  lat
+   -------+-------+-------+-----------------+--------------
+   sphere |  0.0  |  0.0  | -0.405875241137 | 45.1156804622
+   -------+-------+-------+-----------------+--------------
+   WGS84  |  0.0  |  0.0  | -0.405875241137 | 45.2201521896
+
+
+::
 
   lon = -0.405875241137
   lat = 45.2201521896
@@ -189,7 +214,7 @@ grid coordinates.
 
 
 GMT
-===
+---
 
 The generic mapping tools ``GMT`` (ref) is a much used package for map
 projections and plotting. It is independent of proj4 and implements
@@ -220,32 +245,102 @@ This gives grid coordinates directly, as the scaling is part of the
 [Lage en GMTstring i gridmap-pakke??]
 
 Basemap
-=======
+-------
 
-Basemap is a mapping package for the python package matplotlib. It is
-developed by Jeffrey Whitaker with web site
+``Basemap`` is a mapping toolkit for the python package matplotlib. It
+is developed by Jeffrey Whitaker with web site
 http://matplotlib.github.com/basemap/. The map projection part is
-based on proj4.
+based on ``proj4``. The projection can be done by putting the origin
+at the North Pole (with arbitraty values for ``urcrnrlon`` and
+``urcrnrlat``). After rescaling ``xp`` and ``yp`` gives the required
+offset::
 
-projections
------------
+  from mpl_toolkits.basemap import Basemap
+  ..
 
-map plots
----------
+  # Set up the projectiob
+  bmap = Basemap(projection='stere', rsphere=6371000,
+                 llcrnrlon = ylon, llcrnrlat = 90.0,
+                 urcrnrlon = ylon+1, urcrnrlat = 89.0,  
+                 lat_0 = 90.0, lon_0 = ylon, lat_ts = 60.0)
+  
+  # Do the projection
+  x, y = bmap(lon, lat) 
+  x = x / dx + xp   # rescale and add offset to get grid coordinates
+  y = y / dx + yo
+
+For ``WGS84`` use::
+
+  # Elliptical parameters for WGS84
+  a = 6378137.0
+  f = 1./298.257223563
+  b = a*(1-f) 
+
+  # Projection in basemap 
+  bmap = Basemap(projection='stere', rsphere=(a, b),
+            llcrnrlon = ylon, llcrnrlat = 90.0,
+            urcrnrlon = ylon+1, urcrnrlat = 89.0,  
+            lat_0 = 90.0, lon_0 = ylon, lat_ts = 60.0)
+
+The ``gridmap`` package has support for basemap, simplifying the
+``Basemap`` interface. The origin is moved to the grid origin,
+eliminating the need for offset::
+
+  gmap = gridmap.PolarStereographic(xp, yp, dx, ylon)
+  bmap = gmap.basemap()
+  x, y = bmap(lon, lat) 
+  x = x / dx # rescale to get grid coordinates
+  y = y / dx 
+
+  # OOPS, trenger gmap.Lm, gmap.Mm, fiks dette
+
 
 pyproj
-======
+------
 
-Is a python interface to the proj4 library. It is part of basemap,
-but also available separately https://code.google.com/p/pyproj/
+Jeffrey Whitaker (staving korrekt) has implementet a interface to
+``proj4`` as library.  It is part of ``basemap``, but also available
+separately https://code.google.com/p/pyproj/. This is the recommended
+way to use ``proj4`` from ``python``, as it does not need the
+``subprocess`` package and can be used effectively on ``numpy``
+arrays.
+
+As a separate package it is imported as::
+
+  import pyproj
+
+From ``basemap`` it is imported as::
+
+  import mpl_toolkits.basemap.pyproj as pyproj
+  (sjekk dette)
+
+The user interface is simplest by using ``gridmap`` and 
+the ``proj4string``::
+
+  gmap = gridmap.PolarStereographic(xp, yp, dx, ylon)
+  pmap = pyproj.Proj(gmap.proj4string)
+  x, y = pmap(lon, lat)
+  x, y = x/dx, y/dx
+
+  # The inverse projection
+  lon, lat = pmap(x*dx, y*dx, inverse=True)
+
 
 M-Map
-=====
+-----
 
 M_Map is a maping package for Matlab and Octave. 
 
 
 FIMEX
-=====
+-----
+
+
+
+map plots
+=========
+
+
+
 
 
