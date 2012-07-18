@@ -10,7 +10,7 @@
 import sys
 from math import pi
 import unittest
-sys.path = ['../gridmap'] + sys.path # import from developing version
+sys.path = ['..'] + sys.path # import from developing version
 import gridmap
 
 # ------------------------------------

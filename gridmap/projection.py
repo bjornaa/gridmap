@@ -57,31 +57,25 @@ class PolarStereographic(object):
     """Polar stereographic grid mapping"""
 
     def __init__(self, xp, yp, dx, ylon,
-                 Lm=None, Mm=None, ellipsoid=sphere, lat_ts=60.0):
+                 Lm=0, Mm=0, ellipsoid="sphere", lat_ts=60.0):
         self.xp    = xp     # x-coordinate of north pole
         self.yp    = yp     # y-coordinate of north pole
         self.dx    = dx     # grid resolution [m]
         self.ylon  = ylon   # longitude parallell to y-axis [deg]
-
-
-        # OOPS, not compatible with shape of arrays (Mp, Lp)
-        # Use self.Mm, self.Lm instead?
-        #self.shape = shape  # Number of internal grid cells (Lm, Mm)
-        self.Lm = Lm
-        self.Mm = Mm
+        self.Lm = Lm        # Number of internal grid points, x-direction
+        self.Mm = Mm        # Number of internal grid points, y-direction
         self.lat_ts = lat_ts  # latitude of true scale [deg]
         # Allow string arguments for ellipsoid
-        if ellipsoid == "WGS84": ellipsoid = WGS84
+        if ellipsoid == "WGS84":  ellipsoid = WGS84
         if ellipsoid == "sphere": ellipsoid = sphere
         self.ellipsoid = ellipsoid
 
         phi_c = self.lat_ts*rad    
         e = self.ellipsoid.e
-        t_c = tan(0.25*pi-0.5*phi_c)             \
+        self.t_c = tan(0.25*pi-0.5*phi_c)             \
                / ((1-e*sin(phi_c))/(1+e*sin(phi_c)))**(0.5*e)
-        m_c = cos(phi_c) / sqrt(1-(e*sin(phi_c))**2)
-        #self.k_0 = 0.5 * m_c * sqrt((1+e)**(1+e)*(1-e)**(1-e)) / t_c
-        self.t_c, self.m_c = t_c, m_c
+        self.m_c = cos(phi_c) / sqrt(1-(e*sin(phi_c))**2)
+        #self.t_c, self.m_c = t_c, m_c
 
         # Make an option string for proj4
         self.proj4string = self._proj4string()
@@ -144,7 +138,33 @@ class PolarStereographic(object):
         m = cos(phi) / sqrt(1-(e*sin(phi))**2)
         return rho / (a * m)
 
+    def CFmapping_dict(self):
+        """Make a NetCDF grid map attribute dictionary
+
+            Follows the CF standard, with extra attributes
+            `ellipsoid` and `dx`
+        """
+        
+        d = {'grid_mapping_name' : 'polar_stereographic',
+             'latitude_of_projection_origin' : 90.0,
+             'straight_vertical_longitude_from_pole' : self.ylon,
+             'standard_parallel' : self.lat_ts,
+             'false_easting'  : self.xp*self.dx,
+             'false_northing' : self.yp*self.dx,
+             'dx' : self.dx}
+             
+        if self.ellipsoid.invf: # Not sphere => WGS84
+            d['ellipsoid'] = 'WGS84'
+            d['semi_major_axis'] = self.ellipsoid.a
+            d['inverse_flattening'] = self.ellipsoid.invf
+        else: # ellipsoid == 'sphere'
+            d['ellipsoid'] = 'sphere'
+            d['earth_radius'] = self.ellipsoid.a
+
+        return d
+        
     def _proj4string(self):
+        """Make an option string for proj4"""
         proj = "+proj=stere"
         ellipsoid = self.ellipsoid
         if ellipsoid.invf == None:  # sphere
@@ -176,8 +196,6 @@ class PolarStereographic(object):
             # Compute lon/lat of grid corners (needed by basemap)
             lon0, lat0 = self.grid2ll(0.0, 0.0)
             Lm, Mm = self.Lm, self.Mm
-            if not Lm:
-                raise AttributeError, "basemap needs Lm, Mm attributes"
             lon1, lat1 = self.grid2ll(Lm+1.0, Mm+1.0)
                 
             return Basemap(llcrnrlon=lon0, llcrnrlat=lat0,

@@ -22,9 +22,8 @@ gmap = gridmap.PolarStereographic(xp, yp, dx, ylon)
 
 #print gmap.proj4string
 
-1/0
 
-#pmap = pyproj.Proj(gmap.projstring)
+pmap = pyproj.Proj(gmap.proj4string)
 
 
 x0, y0 = gmap.ll2grid(lon, lat)

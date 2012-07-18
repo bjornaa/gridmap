@@ -62,7 +62,7 @@ if __name__ == '__main__':
     # User settings 
     # -------------------
 
-    gridfile  = "demo10km_grd.nc"
+    gridfile  = "demo10km_grid.nc"
     coastfile = "demo10km_coast.dat"
 
     # Set GSHHS resolution, 'c', 'l', 'i', 'h', 'f'

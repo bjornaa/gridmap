@@ -1,2 +1,2 @@
-from gridmap import *
-from define_grid import create_grid
+from projection import *
+from grid import create_grid

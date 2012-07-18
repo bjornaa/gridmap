@@ -29,7 +29,6 @@ def create_grid(gmap, grid_name, file_name):
 
     nc = Dataset(file_name, 'w', format='NETCDF3_CLASSIC')
 
-
     # Global attributes
     nc.gridname = grid_name
     nc.type     = "ROMS grid file"
@@ -42,7 +41,7 @@ def create_grid(gmap, grid_name, file_name):
     Lm, Mm = gmap.Lm, gmap.Mm
     if not Lm:
         raise AttributeError, "grid mapping needs Lm and Mm attributes"
-    L, M = Lm+1, Mm+1
+    L,  M  = Lm+1, Mm+1
     Lp, Mp = Lm+2, Mm+2
     nc.createDimension('xi_rho',  Lp)
     nc.createDimension('eta_rho', Mp)
@@ -166,27 +165,11 @@ def create_grid(gmap, grid_name, file_name):
 
     # --- Grid map
 
-    # Comments on the CF-standard (v. 1.2)
-    # attributes ellipsoid and dx are not required by CF
-    # unclear if both standard_parallel and scale_factor are allowed
-    # No standard name for the grid map variable, call it gridmap_varname
-
     v = nc.createVariable(gridmap_varname, 'i', ())
     v.long_name = "grid mapping"
-    v.grid_mapping_name = "polar_stereographic"
-    if gmap.ellipsoid.invf: # Not sphere => WGS84
-        v.ellipsoid = 'WGS84'
-        v.semi_major_axis = gmap.ellipsoid.a
-        v.inverse_flattening = gmap.ellipsoid.invf
-    else: # ellipsoid == 'sphere'
-        v.ellipsoid = 'sphere'
-        v.earth_radius = gmap.ellipsoid.a
-    v.latitude_of_projection_origin = 90.0
-    v.straight_vertical_longitude_from_pole = gmap.ylon
-    v.standard_parallel = gmap.lat_ts
-    v.false_easting  = gmap.xp*gmap.dx
-    v.false_northing = gmap.yp*gmap.dx
-    v.dx = gmap.dx
+    d = gmap.CFmapping_dict()
+    for att in d:
+        setattr(v, att, d[att])
     v.proj4string = gmap.proj4string
 
     # --- Topography
