@@ -196,7 +196,7 @@ latex_elements = {
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
   ('index', 'gridmap.tex', u'Gridmap Documentation',
-   u'Bjørn Ådlandsvik\\\ Institute of Marine Research', 'howto'),
+   u'Bjørn Ådlandsvik\\\ Institute of Marine Research', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -218,7 +218,7 @@ latex_documents = [
 
 # If false, no module index is generated.
 #latex_domain_indices = True
-
+latex_domain_indices = False
 
 # -- Options for manual page output --------------------------------------------
 

@@ -24,9 +24,9 @@ Without the ``gridmap`` package this can be done in a straight-forward way::
   ...
   f = Dataset(grid_file)
   v = f.variables['grid_mapping']
-  xp = v.false_easting / v.dx
-  yp = v.false_northing / v.dx
   dx = v.dx
+  xp = v.false_easting / dx
+  yp = v.false_northing / dx
   ylon = v.straight_vertical_longitude_from_pole
   Mm = len(f.dimensions['xi_rho'])-2
   Lm = len(f.dimensions['eta_rho'])-2
@@ -42,6 +42,8 @@ With the ``gridmap`` package, it is simplified to::
 Fortran
 -------
 
+Using the fortran 90 
+
 ::
 
   use netcdf
@@ -56,8 +58,6 @@ Fortran
   ...
   status = nf90_inq_varid(ncid, 'grid_mapping', varid)
   status = nf90_get_att(ncid, varid, 'dx', dx)
-
-
 
 shell
 -----
@@ -76,6 +76,38 @@ stereographic parametere from the grid mapping variable
   line=( `grep grid_mapping:straight_vertical_longitude_from_pole $CDL_FILE` )
   ylon=${line[2]}
 
+Octave
+------
+
+Octave (http://www.gnu.org/software/octave/) is an open source
+Matlab-clone. There is a NetCDF interface, ``octcdf`` available
+from http://octave.sourceforge.net/octcdf/index.html .
+
+::
+
+  nc = netcdf(gridfile, 'r');
+  ...
+  Lm = length(nc('xi_rho')) - 2;
+  ...
+  v = nc{'grid_mapping'};
+  dx = v.dx;
+  xp = v.false_easting / dx;
+  yp = v.false_northing / dx;
+  ylon = v.straight_vertical_longitude_from_pole;
+
+
+
+
+
+
+Matlab
+------
+
+Newer versions of Matlab comes with a NetCDF interface. 
+[Har ikke Matlab-lisens, noen bør teste] 
+
+
+
 
 
 Computing grid coordinates
@@ -88,19 +120,30 @@ be read from the file ``demo10km_grid.nc`` as above or given
 explicitly. The projection does not depend on the grid size, so
 ``Lm``, ``Mm`` are left undefined.
 
-::
++--------+--------+-------+------+
+| xp     |    yp  |   dx  | ylon |
++========+========+=======+======+
+| 418.25 | 257.25 | 10000 | 58   |
++--------+--------+-------+------+
 
-  xp      |    yp    |   dx   |  ylon
-  --------+----------+--------+------
-  418.25  | 257.25   | 10000  | 58
+Litt tekst
 
-::
 
-          |  lon  |  lat  |  x            |  y
-   -------+-------+-------+---------------+--------------
-   sphere |   2   |  66   | 208.754891658 | 115.943765186 
-   -------+-------+-------+---------------+--------------
-   WGS84  |   2   |  66   | 207.924459414 | 115.383631565
+xp       yp       dx     ylon
+======   ======   =====  ====
+418.25   257.25   10000  58
+======   ======   =====  ====
+
+Litt tekst
+
+  +--------+-----+-----+---------------+---------------+
+  |        | lon | lat | x             |  y            |
+  +========+=====+=====+===============+===============+
+  | sphere | 2   | 66  | 208.754891658 | 115.943765186 |
+  +--------+-----+-----+---------------+---------------+
+  | WGS84  | 2   | 66  | 207.924459414 | 115.383631565 |
+  +--------+-----+-----+---------------+---------------+
+
 
 
 The different systems are used to compute the grid coordinates of
@@ -111,13 +154,15 @@ station M (2°E, 66°N). The correct values (as computed by proj4) are::
 
 The `inverse` or `backwards` projection is used to find the location
 of the origin (rho-point in lower left grid cell, x=0, y=0). Here the
-authorative values from proj4 are::
+authorative values from proj4 are
 
-          |   x   |  y    |  lon            |  lat
-   -------+-------+-------+-----------------+--------------
-   sphere |  0.0  |  0.0  | -0.405875241137 | 45.1156804622
-   -------+-------+-------+-----------------+--------------
-   WGS84  |  0.0  |  0.0  | -0.405875241137 | 45.2201521896
+   +--------+-----+-----+-----------------+---------------+
+   |        | x   | y   | lon             | lat           |
+   +========+=====+=====+=================+===============+
+   | sphere | 0.0 | 0.0 | -0.405875241137 | 45.1156804622 |
+   +--------+-----+-----+-----------------+---------------+
+   | WGS84  | 0.0 | 0.0 | -0.405875241137 | 45.2201521896 |
+   +--------+-----+-----+-----------------+---------------+
 
 
 ::
