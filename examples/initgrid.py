@@ -3,6 +3,9 @@
 
 """Initiate a small demo grid"""
 
+# Uncomment the following two lines to use the developing
+import sys
+sys.path = ['..'] + sys.path
 import gridmap
 
 # ----------------
@@ -17,13 +20,11 @@ xp, yp, dx, ylon = 418.25, 257.25, 10000, 58
 # Number of internal grid cells
 # deliberately small numbers for the demo
 Lm, Mm = 100, 75
+#Lm, Mm = 1, 1
 
 # Name of grid
 grid_name = "demo10km"
 #grid_name = "demo10km_WGS84"
-
-# Name of grid file
-file_name = grid_name + "_grid.nc"
 
 # -----------------------------------
 
@@ -35,5 +36,6 @@ except NameError:   # ellipsoid not set, using default (= sphere)
     gmap = gridmap.PolarStereographic(xp, yp, dx, ylon, Lm, Mm)
 
 # Create the ROMS grid file
-gridmap.create_grid(gmap, grid_name, file_name)
+#gridmap.create_grid(gmap, grid_name)
+gridmap.create_grid(gmap, grid_name, format='NETCDF4_CLASSIC')
 

@@ -1,7 +1,14 @@
 # -*- coding: utf-8 -*
 
-"""Module for grid mappings for ROMS grid files
+"""Module for grid map projections for ROMS grid
 """
+
+# --------------------------------
+# Bjørn Ådlandsvik <bjorn@imr.no>
+# Institute of Marine Research
+# 2012-07-20
+# --------------------------------
+
 
 from numpy import pi, sqrt, sin, cos, tan, arctan, arctan2
 try:
@@ -22,7 +29,7 @@ rad = pi / 180.0
 
 class Ellipsoid(object):
 
-    """Earth ellipsoids"""
+    """Earth ellipsoid"""
 
     def __init__(self, a, invf=None):
         """Ellipsoid parameters
@@ -75,7 +82,6 @@ class PolarStereographic(object):
         self.t_c = tan(0.25*pi-0.5*phi_c)             \
                / ((1-e*sin(phi_c))/(1+e*sin(phi_c)))**(0.5*e)
         self.m_c = cos(phi_c) / sqrt(1-(e*sin(phi_c))**2)
-        #self.t_c, self.m_c = t_c, m_c
 
         # Make an option string for proj4
         self.proj4string = self._proj4string()
@@ -91,9 +97,9 @@ class PolarStereographic(object):
         a = self.ellipsoid.a
 
         t = tan(0.25*pi-0.5*phi) / ((1-e*sinphi)/(1+e*sinphi))**(0.5*e)
-        rho = a * t * self.m_c / (self.dx * self.t_c)
-        x = self.xp + rho*sin(lambda_ - lambda0)
-        y = self.yp - rho*cos(lambda_ - lambda0)
+        r = a * t * self.m_c / (self.dx * self.t_c)
+        x = self.xp + r*sin(lambda_ - lambda0)
+        y = self.yp - r*cos(lambda_ - lambda0)
         return x, y
 
     def grid2ll(self, x, y):
@@ -107,8 +113,8 @@ class PolarStereographic(object):
         # normalize to (-180,180]
         lambda_ = pi - (pi-lambda_) % (2*pi)
 
-        rho = sqrt((x-xp)*(x-xp) + (y-yp)*(y-yp))
-        t = rho * self.t_c * self.dx / (a * self.m_c)
+        r = sqrt((x-xp)*(x-xp) + (y-yp)*(y-yp))
+        t = r * self.t_c * self.dx / (a * self.m_c)
         chi = 0.5*pi - 2*arctan(t)   # Conformal latitude
         if e > 0:
             phi = chi                                                         \
@@ -134,9 +140,9 @@ class PolarStereographic(object):
 
         lon, lat = self.grid2ll(x, y)
         phi = lat*rad
-        rho = sqrt((x-xp)*(x-xp) + (y-yp)*(y-yp)) * self.dx
+        r = sqrt((x-xp)*(x-xp) + (y-yp)*(y-yp)) * self.dx
         m = cos(phi) / sqrt(1-(e*sin(phi))**2)
-        return rho / (a * m)
+        return r / (a * m)
 
     def CFmapping_dict(self):
         """Make a NetCDF grid map attribute dictionary
@@ -145,14 +151,14 @@ class PolarStereographic(object):
             `ellipsoid` and `dx`
         """
         
-        d = {'grid_mapping_name' : 'polar_stereographic',
-             'latitude_of_projection_origin' : 90.0,
-             'straight_vertical_longitude_from_pole' : self.ylon,
-             'standard_parallel' : self.lat_ts,
-             'false_easting'  : self.xp*self.dx,
-             'false_northing' : self.yp*self.dx,
-             'dx' : self.dx}
-             
+        d = dict(grid_mapping_name = 'polar_stereographic',
+                 latitude_of_projection_origin = 90.0,
+                 straight_vertical_longitude_from_pole = self.ylon,
+                 standard_parallel = self.lat_ts,
+                 false_easting = self.xp*self.dx,
+                 false_northing = self.yp*self.dx,
+                 dx = self.dx)
+                     
         if self.ellipsoid.invf: # Not sphere => WGS84
             d['ellipsoid'] = 'WGS84'
             d['semi_major_axis'] = self.ellipsoid.a
@@ -163,21 +169,26 @@ class PolarStereographic(object):
 
         return d
         
+
     def _proj4string(self):
         """Make an option string for proj4"""
-        proj = "+proj=stere"
-        ellipsoid = self.ellipsoid
-        if ellipsoid.invf == None:  # sphere
+
+        # proj4 representation of the ellipsoid
+        if self.ellipsoid.invf == None:  # sphere
             ellps = "+R=" + str(self.ellipsoid.a)
         else:  # only other case is WGS84
             ellps = "+ellps=WGS84" 
-        lat_0 = "+lat_0=90"
-        lon_0 = "+lon_0=" + str(self.ylon)
-        x_0 = "+x_0=" + str(self.xp*self.dx)
-        y_0 = "+y_0=" + str(self.yp*self.dx)
-        lat_ts = "+lat_ts=" + str(self.lat_ts)
-        projlist = [proj, ellps, lat_0, lat_ts, x_0, y_0, lon_0]
-        return " ".join(projlist)
+
+        # The rest of the options are found in the CF-standard
+        templ = ('+proj=stere',
+                 ellps,
+                 '+lat_0=%(latitude_of_projection_origin)s',
+                 '+lat_ts=%(standard_parallel)s',
+                 '+x_0=%(false_easting)s',
+                 '+y_0=%(false_northing)s',
+                 '+lon_0=%(straight_vertical_longitude_from_pole)s')
+        template = ' '.join(templ)
+        return template % self.CFmapping_dict()
 
     if has_basemap:
         def basemap(self, resolution='i', area_thresh=None):
@@ -225,7 +236,7 @@ def fromfile(nc, var='h'):
 
     Typical usage: 
     >>> nc = NetCDF4.Dataset(roms_grid_file)
-    >>> gmap = gridmap_fromfile(nc)u
+    >>> gmap = gridmap_fromfile(nc)
 
     """
 

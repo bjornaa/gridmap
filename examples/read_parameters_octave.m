@@ -10,7 +10,7 @@
 % 2012-07-17
 % ---------------------------------
 
-gridfile = 'demo10km_grd.nc';
+gridfile = 'demo10km_grid.nc';
 
 nc = netcdf(gridfile, 'r');
 
