@@ -39,7 +39,8 @@ class test_GridGeneration_sphere(unittest.TestCase):
         self.grid_name = "test10km"
         self.file_name = self.grid_name + "_grid.nc"
         self.gmap = gridmap.PolarStereographic(xp, yp, dx, ylon, Lm, Mm)
-        gridmap.create_grid(self.gmap, self.grid_name, self.file_name)
+        #gridmap.create_grid(self.gmap, self.grid_name, self.file_name)
+        gridmap.create_grid(self.gmap, self.grid_name)
         #print "setUp ferdig"
 
 

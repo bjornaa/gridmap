@@ -15,10 +15,12 @@ on sphere or WGS84 ellipsoid
 
 import numpy as np
 from netCDF4 import Dataset
+#from gridmap import fromfile
+import gridmap  # fiks relativ import
 
-def create_grid(gmap, grid_name, file_name='', format='NETCDF3_CLASSIC'):
+def make_empty_gridfile(grid_name, file_name, Lm, Mm, format='NETCDF3_CLASSIC'):
     """
-    Create a new ROMS grid file for a polar stereographic grid
+    Create a new empty ROMS grid file
 
     Arguments:
       gmap      : a gridmap.PolarStereographic instance
@@ -28,40 +30,30 @@ def create_grid(gmap, grid_name, file_name='', format='NETCDF3_CLASSIC'):
       format    : 'NETCDF3_CLASSIC' or 'NETCDF4_CLASSIC'
                   default = 'NETCDF3_CLASSIC'
 
-    Fills in geometric variables (lons, lats, metric, Coriolis).
-    Makes space for topographic variables (h, hraw, masks).
-    Also makes coordinate variables and includes grid mapping info
-    following the CF-standard.
+    Make space for all variables, including coordinate variables
     
     """
-
+    
     if not file_name:  # Use default
         file_name = grid_name + '_grid.nc'
-        
-    gridmap_varname = 'grid_mapping' # Name of grid mapping variable
 
+    # Ta denne med polarstereografisk ???
+    gridmap_varname = 'grid_mapping' # Name of grid mapping variable
+    
     # -----------------------
     # NetCDF file definition
     # -----------------------
-
-    #print "Defining the grid file:", file_name
 
     nc = Dataset(file_name, 'w', format=format)
 
     # Global attributes
     nc.gridname = grid_name
     nc.type     = "ROMS grid file"
-    nc.history  = "Created by gridmap.create_grid"
+    nc.history  = "Created by gridmap"
     # Need CF-1.2 to define ellipsoid parameters
-    nc.Conventions = "CF-1.2"
-    nc.institution = "Institute of Marine Research"
+    #nc.Conventions = "CF-1.2"
+    #nc.institution = "Institute of Marine Research"
 
-    # Define dimensions
-    Lm, Mm = gmap.Lm, gmap.Mm
-    # Kan ikke ha Lm = 0 eller Mm = 0
-    # problemer med dmde, dndx ved endelige differanser
-    if not Lm*Mm:
-        raise AttributeError, "grid creation needs Lm and Mm > 0"
     L,  M  = Lm+1, Mm+1
     Lp, Mp = Lm+2, Mm+2
     nc.createDimension('xi_rho',  Lp)
@@ -187,10 +179,10 @@ def create_grid(gmap, grid_name, file_name='', format='NETCDF3_CLASSIC'):
 
     v = nc.createVariable(gridmap_varname, 'i', ())
     v.long_name = "grid mapping"
-    d = gmap.CFmapping_dict()
-    for att in d:
-        setattr(v, att, d[att])
-    v.proj4string = gmap.proj4string
+    #d = gmap.CFmapping_dict()
+    #for att in d:
+    #    setattr(v, att, d[att])
+    #v.proj4string = gmap.proj4string
 
     # --- Topography
 
@@ -260,6 +252,49 @@ def create_grid(gmap, grid_name, file_name='', format='NETCDF3_CLASSIC'):
     v.long_name = "domain length in the ETA-direction" 
     v.units = "meter" 
 
+    nc.close()
+
+
+def create_grid(gmap, grid_name, file_name='', format='NETCDF3_CLASSIC'):
+    """
+    Create a new ROMS grid file for a polar stereographic grid
+
+    Arguments:
+      gmap      : a gridmap.PolarStereographic instance
+      grid_name : name of the grid
+      file_name : name of the grid file,
+                  default = '' giving grid_name + '_grid.nc'
+      format    : 'NETCDF3_CLASSIC' or 'NETCDF4_CLASSIC'
+                  default = 'NETCDF3_CLASSIC'
+
+    Fills in geometric variables (lons, lats, metric, Coriolis).
+    Makes space for topographic variables (h, hraw, masks).
+    Also makes coordinate variables and includes grid mapping info
+    following the CF-standard.
+    
+    """
+
+    if not file_name:  # Use default
+        file_name = grid_name + '_grid.nc'
+
+    make_empty_gridfile(grid_name, file_name, gmap.Lm, gmap.Mm, format=format)
+
+    nc = Dataset(file_name, 'a')
+
+    gridmap_varname = 'grid_mapping' # Name of grid mapping variable
+    Lm, Mm = gmap.Lm, gmap.Mm
+
+    # --- Grid map
+
+    #v = nc.createVariable(gridmap_varname, 'i', ())
+    v = nc.variables[gridmap_varname]
+    #v.long_name = "grid mapping"
+    d = gmap.CFmapping_dict()
+    for att in d:
+        setattr(v, att, d[att])
+    v.proj4string = gmap.proj4string
+
+
     # ------------------------------------------------------
     # Compute variables defined by only by the grid mapping
     # ------------------------------------------------------
@@ -269,12 +304,12 @@ def create_grid(gmap, grid_name, file_name='', format='NETCDF3_CLASSIC'):
     # -----------------------
     # Coordinate variables
     # -----------------------
-    nc.variables['xi_rho'][:]  = gmap.dx*np.arange(Lp)
-    nc.variables['eta_rho'][:] = gmap.dx*np.arange(Mp)
-    nc.variables['xi_u'][:]    = gmap.dx*(np.arange(L)+0.5)
-    nc.variables['eta_u'][:]   = gmap.dx*np.arange(Mp)
-    nc.variables['xi_v'][:]    = gmap.dx*np.arange(Lp)
-    nc.variables['eta_v'][:]   = gmap.dx*(np.arange(M)+0.5)
+    nc.variables['xi_rho'][:]  = gmap.dx*np.arange(Lm+2)
+    nc.variables['eta_rho'][:] = gmap.dx*np.arange(Mm+2)
+    nc.variables['xi_u'][:]    = gmap.dx*(np.arange(Lm+1)+0.5)
+    nc.variables['eta_u'][:]   = gmap.dx*np.arange(Mm+2)
+    nc.variables['xi_v'][:]    = gmap.dx*np.arange(Lm+2)
+    nc.variables['eta_v'][:]   = gmap.dx*(np.arange(Mm+1)+0.5)
 
     # ----------
     # Vertices 
@@ -291,11 +326,6 @@ def create_grid(gmap, grid_name, file_name='', format='NETCDF3_CLASSIC'):
     Xrho = Xvert[1::2, 1::2]
     Yrho = Yvert[1::2, 1::2]
 
-    # -------------------------
-    # Longitude and latitude
-    # ------------------------
-
-    # Vertices
     lon_vert, lat_vert = gmap.grid2ll(Xvert, Yvert)
 
     # Set the different points
@@ -370,8 +400,8 @@ def create_grid(gmap, grid_name, file_name='', format='NETCDF3_CLASSIC'):
     # ------------------
 
     nc.variables['spherical'].assignValue('T')
-    nc.variables['xl'].assignValue(L*gmap.dx)
-    nc.variables['el'].assignValue(M*gmap.dx)
+    nc.variables['xl'].assignValue((Lm+1)*gmap.dx)
+    nc.variables['el'].assignValue((Mm+1)*gmap.dx)
 
     # ---------------------
     # Close the grid file
@@ -379,6 +409,92 @@ def create_grid(gmap, grid_name, file_name='', format='NETCDF3_CLASSIC'):
 
     nc.close()
 
+# -------------------------------------------------------
+
+def subgridfile(file0, file1, i0, j0, Lm, Mm):
+    ### Funker ikke helt
+
+    f0 = Dataset(file0)
+    gmap0 = gridmap.fromfile(f0)
+
+    gmap1 = gridmap.subgrid(gmap0, i0, j0, Lm, Mm)
+
+    grid_name = f0.gridname + "_sub"
+
+    gridmap_varname = "grid_mapping"  # Les denne fra filen
+
+    # Make an empty grid file of the correct shape
+    make_empty_gridfile(grid_name, file1, Lm, Mm, format=f0.file_format)
+
+    # Open this grid file
+    f1 = Dataset(file1, 'a')
+    # Add grid mapping
+    v = f1.variables[gridmap_varname]
+    #v.long_name = "grid mapping"
+    d = gmap1.CFmapping_dict()
+    for att in d:
+        setattr(v, att, d[att])
+    v.proj4string = gmap1.proj4string
+
+    # -----------------------
+    # Coordinate variables
+    # -----------------------
+    f1.variables['xi_rho'][:]  = gmap1.dx*np.arange(Lm+2)
+    f1.variables['eta_rho'][:] = gmap1.dx*np.arange(Mm+2)
+    f1.variables['xi_u'][:]    = gmap1.dx*(np.arange(Lm+1)+0.5)
+    f1.variables['eta_u'][:]   = gmap1.dx*np.arange(Mm+2)
+    f1.variables['xi_v'][:]    = gmap1.dx*np.arange(Lm+2)
+    f1.variables['eta_v'][:]   = gmap1.dx*(np.arange(Mm+1)+0.5)
+
+    # -------------------------
+    # rho-point variables
+    # ------------------------
+
+    vars = ['lon_rho', 'lat_rho', 'mask_rho', 
+            'pm', 'pn', 'dmde', 'dndx', 'angle',
+            'f', 'h']
+
+    for var in vars:
+        v0 = f0.variables[var]
+        v1 = f1.variables[var]
+        v1[:,:] = v0[j0:j0+Mm+2, i0:i0+Lm+2]
+
+    # hraw is special
+    v0 = f0.variables['hraw']
+    v1 = f1.variables['hraw']
+    for t in range(len(f0.dimensions['bath'])):
+        v1[t,:,:] = v0[j0:j0+Mm+2, i0:i0+Lm+2]
+
+    # u-point variables
+    vars = ['lon_u', 'lat_u', 'mask_u']
+    for var in vars:
+        v0 = f0.variables[var]
+        v1 = f1.variables[var]
+        # Eller er det i0+1:i0+Lm+2
+        v1[:,:] = v0[j0:j0+Mm+2, i0:i0+Lm+1]
+        
+    # v-point variables
+    vars = ['lon_v', 'lat_v', 'mask_v']
+    for var in vars:
+        v0 = f0.variables[var]
+        v1 = f1.variables[var]
+        v1[:,:] = v0[j0:j0+Mm+1, i0:i0+Lm+2]
+
+    # psi-point variables
+    vars = ['mask_psi']
+    for var in vars:
+        v0 = f0.variables[var]
+        v1 = f1.variables[var]
+        # sjekk om indeksering er forskjøvet
+        v1[:,:] = v0[j0:j0+Mm+1, i0:i0+Lm+1]
+
+    # Some special variables
+    f1.variables['spherical'].assignValue('T')
+    f1.variables['xl'].assignValue((Lm+1)*gmap1.dx)
+    f1.variables['el'].assignValue((Mm+1)*gmap1.dx)
+
+    f1.close()
 
 
-  
+
+    

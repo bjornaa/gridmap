@@ -9,7 +9,6 @@
 # 2012-07-20
 # --------------------------------
 
-
 from numpy import pi, sqrt, sin, cos, tan, arctan, arctan2
 try:
     from mpl_toolkits.basemap import Basemap
@@ -17,8 +16,8 @@ try:
 except:
     has_basemap = False
 
-all = ['Ellipsoid', 'Sphere', 'sphere', 'WGS84', 
-       'PolarStereographic', 'fromfile']
+__all__ = ['Ellipsoid', 'Sphere', 'sphere', 'WGS84', 
+       'PolarStereographic', 'fromfile', 'rotate', 'subgrid']
 
 deg = 180.0 / pi
 rad = pi / 180.0
@@ -261,6 +260,50 @@ def fromfile(nc, var='h'):
 
     #return PolarStereographic(xp, yp, dx, ylon, shape, lat_ts, ellipsoid)
     return PolarStereographic(xp, yp, dx, ylon,
-                Lm=Lm, Mm=Mm, lat_ts=lat_ts, ellipsoid=ellipsoid)
+                              Lm, Mm, ellipsoid, lat_ts)
 
+# -----------------------------------
+
+def rotate(gmap):
+    """
+    Rotate a grid mapping 90 degrees counterclockwise
+
+    New grid coordinates (x1, y1) are given by
+      x1 = Mm + 1 - y; y1 = x
+    """
+
+    xp = gmap.Mm + 1 - gmap.yp
+    yp = gmap.xp
+    ylon = gmap.ylon - 90
+    if ylon <= -180: ylon = ylon + 360  # Normalize to (-180,180]
+    Lm = gmap.Mm
+    Mm = gmap.Lm
+
+    return PolarStereographic(xp, yp, gmap.dx, ylon, Lm, Mm,
+                              gmap.ellipsoid, gmap.lat_ts)
+
+# -----------
+
+def subgrid(gmap, i0, j0, Lm, Mm):
+    """
+    Return a subgrid with origin at (i0,j0)
+    
+    New grid coordinates (x1, y1) are given by
+      x1 = x - i0,  y1 = y - j0
+
+    Subgrid requirement, must have
+      i0 + Lm <= gmap.Lm; j0 + Mm <= gmap.Mm
+    """
+
+    if i0 + Lm > gmap.Lm:
+        raise ValueError, "i0 + Lm too large"
+    if j0 + Mm > gmap.Mm:
+        raise ValueError, "j0 + Mm too large"
+    
+    xp = gmap.xp - i0
+    yp = gmap.yp - j0
+
+    return PolarStereographic(xp, yp, gmap.dx, gmap.ylon, Lm, Mm,
+                              gmap.ellipsoid, gmap.lat_ts)
+    
 
