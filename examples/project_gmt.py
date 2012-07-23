@@ -68,15 +68,18 @@ if __name__ == '__main__':
     print "\n --- sphere ---\n"
     # ----------------------------
 
+    m = 193.713819606 / 208.754891658
+
+
     gmap = PolarStereographic(xp, yp, dx, ylon)
 #
-#    projection = '-V  -Js%s/90.0/%s/1:%s' % \
-#                 (str(ylon), str(gmap.lat_ts), str(100*dx))
-#                 (str(ylon), str(gmap.lat_ts), str(100*dx))
+    projection = '-Js%s/90.0/%s/1:%s -Dm' % \
+                 (str(ylon), str(gmap.lat_ts), str(dx))
 
-    projection = '  -Js58.0/90.0/60.0/1:1000000c'
 
-    ellipsoid = ""
+#    projection = '-Js58.0/90.0/60.0/1:10000 -Dm'
+
+    #ellipsoid = ""
     #ellipsoid = "--ELLIPSOID=Sphere"
     #ellipsoid = "--ELLIPSOID=WGS-84"
     ## Ser ut som ellipsoid er gitt på korrekt vis, men får feil
@@ -86,9 +89,11 @@ if __name__ == '__main__':
     # Den under virker og gir WGS84
     #ellipsoid = "--ELLIPSOID=%s%s" % ("6378137,f=", str(1/298.257223563))
     #ellipsoid = "--ELLIPSOID=%s" % "6371000,f=0"
-    #ellipsoid = "--ELLIPSOID=%s" % "6371000,b=6371000"
+    ellipsoid = "--ELLIPSOID=%s" % "6371000,b=6371000"
 
-    extent = '-R0/1/60/61'   # Actual values are not used
+    
+
+    extent = '-R0/1/60/61 --MAP_SCALE_FACTOR=%s' % str(1/m)   # Actual values are not used
     offset = '-C%s/%s' % (str(xp), str(yp))
     gmtstring = " ".join((ellipsoid, projection, offset, extent))
 
@@ -106,7 +111,7 @@ if __name__ == '__main__':
     print "mapproject -I  : ", lon1, lat1
     print "gmap.grid2ll   : ", lon0, lat0
 
-    import sys; sys.exit(0)
+    #import sys; sys.exit(0)
 
     # ---------------------------
     print "\n --- WGS84 ---\n"
@@ -114,8 +119,8 @@ if __name__ == '__main__':
 
     gmap = PolarStereographic(xp, yp, dx, ylon, ellipsoid="WGS84")
 
-    projection = '-Js%s/90.0/%s/1:%s' % \
-                 (str(ylon), str(gmap.lat_ts), str(100*dx))
+    projection = '-Js%s/90.0/%s/1:%s -Dm' % \
+                 (str(ylon), str(gmap.lat_ts), str(dx))
     extent = '-R0/1/60/61'   # Actual values are not used
     offset = '-C%s/%s' % (str(xp), str(yp))
     gmtstring = " ".join((projection, offset, extent))
