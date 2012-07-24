@@ -18,7 +18,8 @@ from netCDF4 import Dataset
 #from gridmap import fromfile
 import gridmap  # fiks relativ import
 
-def make_empty_gridfile(grid_name, file_name, Lm, Mm, format='NETCDF3_CLASSIC'):
+def make_empty_gridfile(grid_name, file_name, Lm, Mm, 
+                        global_attributes, format):
     """
     Create a new empty ROMS grid file
 
@@ -47,12 +48,19 @@ def make_empty_gridfile(grid_name, file_name, Lm, Mm, format='NETCDF3_CLASSIC'):
     nc = Dataset(file_name, 'w', format=format)
 
     # Global attributes
-    nc.gridname = grid_name
-    nc.type     = "ROMS grid file"
-    nc.history  = "Created by gridmap"
-    # Need CF-1.2 to define ellipsoid parameters
-    #nc.Conventions = "CF-1.2"
-    #nc.institution = "Institute of Marine Research"
+    # Defaults
+    global_defaults = dict(gridname    = grid_name, 
+                           type        = 'ROMS grid file',
+                           history     = 'Created by gridmap', 
+                           Conventions = 'CF-1.2')
+    d = {}
+    d.update(global_defaults, **global_attributes)
+
+    #print d
+    for att, value in d.iteritems():
+        setattr(nc, att, value)
+
+    # Dimensions
 
     L,  M  = Lm+1, Mm+1
     Lp, Mp = Lm+2, Mm+2
@@ -255,7 +263,9 @@ def make_empty_gridfile(grid_name, file_name, Lm, Mm, format='NETCDF3_CLASSIC'):
     nc.close()
 
 
-def create_grid(gmap, grid_name, file_name='', format='NETCDF3_CLASSIC'):
+def create_grid(gmap, grid_name, file_name='', 
+                global_attributes={},
+                format='NETCDF3_CLASSIC'):
     """
     Create a new ROMS grid file for a polar stereographic grid
 
@@ -277,7 +287,9 @@ def create_grid(gmap, grid_name, file_name='', format='NETCDF3_CLASSIC'):
     if not file_name:  # Use default
         file_name = grid_name + '_grid.nc'
 
-    make_empty_gridfile(grid_name, file_name, gmap.Lm, gmap.Mm, format=format)
+    make_empty_gridfile(grid_name, file_name, gmap.Lm, gmap.Mm, 
+                        global_attributes=global_attributes,
+                        format=format)
 
     nc = Dataset(file_name, 'a')
 

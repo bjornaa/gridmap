@@ -4,6 +4,7 @@
 """Initiate a small demo grid"""
 
 # Uncomment the following two lines to use the developing
+import datetime
 import sys
 sys.path = ['..'] + sys.path
 import gridmap
@@ -26,6 +27,11 @@ Lm, Mm = 100, 75
 grid_name = "demo10km"
 #grid_name = "demo10km_WGS84"
 
+#
+global_attributes = dict(Institution = 'Institute of Marine Research',
+                         date = str(datetime.date.today()))
+
+
 # -----------------------------------
 
 # Define the grid map object, with grid size
@@ -37,5 +43,7 @@ except NameError:   # ellipsoid not set, using default (= sphere)
 
 # Create the ROMS grid file
 #gridmap.create_grid(gmap, grid_name)
-gridmap.create_grid(gmap, grid_name, format='NETCDF4_CLASSIC')
+gridmap.create_grid(gmap, grid_name, 
+                    global_attributes=global_attributes,
+                    format='NETCDF4_CLASSIC')
 
