@@ -14,12 +14,16 @@ tasks can be done by other tools if they are better suited.
 The document is written in restructured text and can easily be
 converted to html or pdf (via latex).
 
-Define the grid and initialize the grid file
---------------------------------------------
+The workflow is modular and incremental, leaving it open for different
+methods.  After the grid file is initiated in step 2, other tools can
+be used to add topography, edit the landmask and smooth the
+topography. This can be tools in fortran, matlab or python.
 
-This step defines the grid and initializes the grid file.
 
-The grid is given by parameters::
+1. Define the grid
+------------------
+
+A polar stereographic grid is given by the following parameters::
 
   Lm = The number of interior grid cells in X-direction
   Mm = The number of interior grid cells in Y-direction
@@ -30,53 +34,81 @@ The grid is given by parameters::
   ylon = vertical meridian
   
   lon_ts = longitude of true scale, always 60.0
-  ellipsoid: sphere (with radius) or WGS84
+  ellipsoid: sphere with radius 6371 km (default) or WGS84
    
-Let X and Y denote grid coordinates i.e.
-X = i, Y = j is the (i,j)-th rho-point with ROMS indexing
-(starting from zero for rho-points).
+The first step is to determine suitable values here. Some tools are
+available.
 
-Adjust the grid definition variables in the user setting
-section of the script define_grid.py
+The least intuitive is to find `xp` and `yp`. If you have decided 
+the resolution `dx` and rotation angle `ylon` and know where to put
+the origin. The script `examples/find_xpyp.py` may be useful. Copy the 
+script to the working directory, edit the 'user settings' and run::
+
+  python find_xpyp
+
+Choose suitably round values for `xp` and `yp` close to the values returned by
+the script.
+
+The next step is to plot the domain. If you have the `basemap` toolkit
+for `matplotlib` installed, copy `examples/plot_basegrid.py` to the
+working directory, edit the parameters in the file and run::
+
+  python plot_basegrid.py
+
+For small adjustements, increasing `xp` resp. `yp` extends the domain
+to the left resp. downwards. Increasing `Lm` and `Mm` extends the
+domain to the right resp. upwards.
+
+If the Generic Mapping Tools (GMT) are installed on the system, the script
+`examples/plot_gmt_map.py` can be used similarly.
+
+[legg inn matlab/python plot med mmap]
+
+2. Initiate the grid file
+-------------------------
+
+Copy the script `examples/initgrid.py` to your working directory and 
+edit the mapping parameters, grid name and institution.  Run::
+
+  python initgrid.py
 
 The script generates a grid file with place-holders for all variables
 and fills in topography-independent values, such as longitudes,
-latitudes, metric factors, coriolis and rotation angle.
+latitudes, metric factors, Coriolis and rotation angle.
 
 The script adds metainformation including a map projection details
-in a format complaying with the CF-standard (CF-1.2).
+in a format complying with the CF-standard (CF-1.2).
 
-The grid with coastline can be plotted by plot_basegrid.py (requiring
-basemap) or plot_base.. (requirs GMT).
+3. Add the raw topography
+-------------------------
 
-Add the raw topography
-----------------------
+This step is quite open, as there are a lot of different bathymetric
+datasets available. If the resolution in the data source is similar to
+the grid use your favourite interpolation method. If the data source
+is finer, the averaging procedure described here is recommended.
+If the data source is coarser than the grid, you have a problem.
 
-If the topography comes from a finer source than the target grid
-the method of the ``etopo1grid.py`` can be used. As there are many 
-topography values inside each grid cell, it returns the average of the
-sea values inside the grid cell. If the grid cell is entirely at land
-a value of zero is used. This is added to the grid file as the first
-record in the hraw variable. 
+In any case, save the unmodified topography as the first field in
+`hraw` to make it possible to go back and redo the later steps if
+wanted. It is also recommended to make a backup copy of the file
+after this step, as further modifications of the file may ruin it.
 
-The script can be speeded up by restricting the range of longitude
-and latitude to be read in. The script may take a long time, in
-particular if the North Pole is included in the grid.
-(45 minutes for the arctic10_WGS84 grid). It is also recommended to
-make a backup copy of the grid file at this stage, in case further
-processing ruins some of the information.
+In the lucky case where a fine dataset is available, averaging the
+topography points inside a grid cell is recommended. First, this is
+simpler than interpolation and second it gives a better estimate of
+the mean depth of the cell. The method is used in the script
+`etopo1grid.py`. The script may take a long time to run, in particular
+if the North Pole is included in the grid. Restricting the range of 
+topography points considered can speed it up substantially.
 
 The script also makes an auxiliary netcdf file, ``aux.nc``, saving the
 mean value and standard deviation of topography within each grid cell
 as well as the total number C0 of topography points and the number of
-sea points C inside the cell.
+sea points C inside the cell. This file may be useful for further
+steps in the grid generation.
 
-If the resolution of the topography source is similar to the target
-grid, the method above is not feasible. Instead an interpolation
-routine must be used.
-
-Extract a coast line
---------------------
+4. Extract a coast line
+-----------------------
 
 The script ``makecoast.py`` uses basemap to make a coast line. In the user
 settings the name of the grid file and the GSHHS resolution code must
@@ -87,6 +119,29 @@ The resulting coast line is given in grid coordinates and is clipped
 towards the grid boundary (the outer boundary of the boundary cells).
 
 NOTE: A good idea to add the coast line to the grid file?
+
+If the matlab tools are used, this is not necessary as a separate
+tool, as `editmask.m` makes a coast line in grid coordinates the first
+time it is called.
+
+5. Make an initial land mask
+----------------------------
+
+6. Edit the land mask
+---------------------
+
+7. Compute the other masks
+--------------------------
+
+8. Smooth the topography
+------------------------
+
+This step may be quite demanding. The topography should be smoothed to
+1) set a minimum depth, 2) avoid steep gradients causing problems with
+the pressure gradient and 3) avoid noice on the smallest (2*dx) wave
+length.
+
+
 
 
 
