@@ -243,7 +243,10 @@ def fromfile(nc, var='h'):
     #print "nc = ", nc
     #print "var = ", var
     #print "nc.variables[var] = ", nc.variables[var]
-    grid_mapping_variable = nc.variables[var].grid_mapping
+    if nc.variables[var].long_name == "grid mapping": 
+        grid_mapping_variable = var
+    else:
+        grid_mapping_variable = nc.variables[var].grid_mapping
     v = nc.variables[grid_mapping_variable]
     # 
     if v.ellipsoid == 'WGS84':
@@ -255,8 +258,9 @@ def fromfile(nc, var='h'):
     yp = v.false_northing / dx
     ylon = v.straight_vertical_longitude_from_pole
     lat_ts = v.standard_parallel
-    Mp, Lp = nc.variables[var].shape
-    Lm, Mm = Lp-2, Mp-2
+    #Mp, Lp = nc.variables[var].shape
+    Lm = len(nc.dimensions['xi_rho'])-2
+    Mm = len(nc.dimensions['eta_rho'])-2
 
     #return PolarStereographic(xp, yp, dx, ylon, shape, lat_ts, ellipsoid)
     return PolarStereographic(xp, yp, dx, ylon,
