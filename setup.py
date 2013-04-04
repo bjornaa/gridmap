@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # ------------------------------------
-# setup-file for the roppy package
+# setup-file for the gridmap package
 # Bjørn Ådlandsvik, <bjorn@imr.no>
 # Institute of Marine Research
 # 2012-05-22
