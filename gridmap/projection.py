@@ -300,9 +300,9 @@ def subgrid(gmap, i0, j0, Lm, Mm):
     """
 
     if i0 + Lm > gmap.Lm:
-        raise ValueError, "i0 + Lm too large"
+        raise ValueError("i0 + Lm too large")
     if j0 + Mm > gmap.Mm:
-        raise ValueError, "j0 + Mm too large"
+        raise ValueError("j0 + Mm too large")
     
     xp = gmap.xp - i0
     yp = gmap.yp - j0
