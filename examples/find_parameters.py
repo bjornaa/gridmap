@@ -127,7 +127,7 @@ if __name__ == '__main__':
     i = gmap.Lm // 2
     j = gmap.Mm // 3
 
-    good = is_polstereo(f, gmap, j, i)
+    good = is_polstereo(f, gmap, i, j)
     
     if not good:
         print "%s : not polar stereographic grid mapping" % ROMSfile

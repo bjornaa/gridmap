@@ -18,6 +18,9 @@ from netCDF4 import Dataset
 #from gridmap import fromfile
 import gridmap  # fiks relativ import
 
+
+# TODO: Make it possible to specify the order of the
+#       global attributes
 def make_empty_gridfile(grid_name, file_name, Lm, Mm, 
                         global_attributes, format):
     """
