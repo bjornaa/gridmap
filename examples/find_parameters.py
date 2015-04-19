@@ -7,6 +7,7 @@ Assumes spherical earth, R = 6361 km
 and true scale at 60 degrees north
 
 """
+from __future__ import print_function
 
 import sys
 import numpy as np
@@ -25,7 +26,7 @@ def find_parameters(f):
     Input:
       f: a netCDF4.Dataset from a grid file
 
-    Returns a PolarStereographic instance
+    Returnurns a PolarStereographic instance
 
     The variables lon_rho, lat_rho, angle, and pm are required
     in the file.
@@ -108,20 +109,20 @@ if __name__ == '__main__':
     try:
         ROMSfile = sys.argv[1]
     except IndexError:
-        print usage
+        print(usage)
         sys.exit(1)
 
     try:
         f = Dataset(ROMSfile)
     except RuntimeError as e:
-        print "%s : %s" % (ROMSfile, e)
+        print("%s : %s" % (ROMSfile, e))
         sys.exit(1)
  
     # Find the parameteres
     try:
         gmap = find_parameters(f)
     except KeyError as e:
-        print "KeyError:", e
+        print("KeyError:", e)
         sys.exit(1)
         
     i = gmap.Lm // 2
@@ -130,16 +131,16 @@ if __name__ == '__main__':
     good = is_polstereo(f, gmap, j, i)
     
     if not good:
-        print "%s : not polar stereographic grid mapping" % ROMSfile
+        print("%s : not polar stereographic grid mapping" % ROMSfile)
         sys.exit(1)
 
-    print "%s : polar stereographic grid mapping" % ROMSfile
-    print "xp   = ", gmap.xp
-    print "yp   = ", gmap.yp
-    print "dx   = ", gmap.dx
-    print "ylon = ", gmap.ylon
-    print "Lm   = ", gmap.Lm
-    print "Mm   = ", gmap.Mm
+    print("%s : polar stereographic grid mapping" % ROMSfile)
+    print("xp   = ", gmap.xp)
+    print("yp   = ", gmap.yp)
+    print("dx   = ", gmap.dx)
+    print("ylon = ", gmap.ylon)
+    print("Lm   = ", gmap.Lm)
+    print("Mm   = ", gmap.Mm)
 
 
 

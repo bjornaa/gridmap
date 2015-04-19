@@ -76,8 +76,8 @@ class test_GridFile(unittest.TestCase):
         Lm, Mm = 30, 20
         self.grid_name = "test10km"
         self.file_name = self.grid_name + "_grid.nc"
-        gmap = gridmap.PolarStereographic(xp, yp, dx, ylon, Lm, Mm)
-        gridmap.create_grid(gmap, self.grid_name, self.file_name)
+        self.gmap = gridmap.PolarStereographic(xp, yp, dx, ylon, Lm, Mm)
+        gridmap.create_grid(self.gmap, self.grid_name, self.file_name)
 
     def tearDown(self):
         """Remove the grid file"""
@@ -90,7 +90,7 @@ class test_GridFile(unittest.TestCase):
     def test_subgridfile(self):
         i0, j0 = 10, 5
         Lm, Mm = 10, 8
-        gridmap.subgridfile(self.file_name, 'a.nc', i0, j0, Lm, Mm)
+        gridmap.subgridfile(self.file_name,  'a.nc', i0, j0, Lm, Mm)
         # en test: samme antall linjer i cdl-fil (ncdump -h)v
         # test: lon m.m. er den samme
 

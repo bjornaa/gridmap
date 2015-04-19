@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+
+from __future__ import print_function
+
 from os import system
 from netCDF4 import Dataset
 import gridmap
@@ -27,8 +31,7 @@ landcolor = '-Ggreen'
 
 command = "pscoast %s %s %s %s -Wthinnest -A200  > a.ps" % \
             (projection, extent, boundary, landcolor)
-print command
-
+print(command)
 system(command)
 
 system('gv a.ps')

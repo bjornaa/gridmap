@@ -18,8 +18,10 @@ basemap: http://matplotlib.github.com/basemap/
 # 2012-06-10
 # -----------------------------------
 
-import pyproj                                 # separate pyproj
-#import mpl_toolkits.basemap.pyproj as pyproj  # pyproj from basemap
+from __future__ import print_function
+
+#import pyproj                                 # separate pyproj
+import mpl_toolkits.basemap.pyproj as pyproj  # pyproj from basemap
 
 xp    = 418.25        # x grid coordinate of north pole
 yp    = 257.25        # y grid coordinate of north pole
@@ -48,10 +50,10 @@ pmap = pyproj.Proj(proj_dict)
 
 x, y = pmap(lon, lat)
 x, y = x/dx, y/dx
-print "sphere: x, y = ", x, y
+print("sphere: x, y = ", x, y)
 
 lon1, lat1 = pmap(x*dx, y*dx, inverse=True)
-print "sphere: lon, lat = ", lon1, lat1
+print("sphere: lon, lat = ", lon1, lat1)
 
 # -------------
 # WGS84 case
@@ -65,10 +67,10 @@ pmap = pyproj.Proj(proj_dict)
 
 x, y = pmap(lon, lat)
 x, y = x/dx, y/dx
-print "WGS84:  x, y = ", x, y
+print("WGS84:  x, y = ", x, y)
 
 lon1, lat1 = pmap(x*dx, y*dx, inverse=True)
-print "WGS84:  lon, lat = ", lon1, lat1
+print("WGS84:  lon, lat = ", lon1, lat1)
 
 
 
