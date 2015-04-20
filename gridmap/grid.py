@@ -18,9 +18,6 @@ from netCDF4 import Dataset
 #from gridmap import fromfile
 import gridmap  # fiks relativ import
 
-
-# TODO: Make it possible to specify the order of the
-#       global attributes
 def make_empty_gridfile(grid_name, file_name, Lm, Mm, 
                         global_attributes, format):
     """
@@ -30,7 +27,7 @@ def make_empty_gridfile(grid_name, file_name, Lm, Mm,
       gmap      : a gridmap.PolarStereographic instance
       grid_name : name of the grid
       file_name : name of the grid file,
-                  default = '' giving grid_name + '_grid.nc'
+                 default = '' giving grid_name + '_grid.nc'
       format    : 'NETCDF3_CLASSIC' or 'NETCDF4_CLASSIC'
                   default = 'NETCDF3_CLASSIC'
 
@@ -60,11 +57,10 @@ def make_empty_gridfile(grid_name, file_name, Lm, Mm,
     d.update(global_defaults, **global_attributes)
 
     #print d
-    for att, value in d.iteritems():
+    for att, value in d.items():
         setattr(nc, att, value)
 
     # Dimensions
-
     L,  M  = Lm+1, Mm+1
     Lp, Mp = Lm+2, Mm+2
     nc.createDimension('xi_rho',  Lp)
@@ -439,7 +435,8 @@ def subgridfile(file0, file1, i0, j0, Lm, Mm):
     gridmap_varname = "grid_mapping"  # Les denne fra filen
 
     # Make an empty grid file of the correct shape
-    make_empty_gridfile(grid_name, file1, Lm, Mm, format=f0.file_format)
+    make_empty_gridfile(grid_name, file1, Lm, Mm,
+                        global_attributes={},format=f0.file_format)
 
     # Open this grid file
     f1 = Dataset(file1, 'a')

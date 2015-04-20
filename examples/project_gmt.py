@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 
+## NOTE: Problem with this with python3
+
+from __future__ import print_function
+
 #import sys
 import subprocess
 import struct
@@ -17,15 +21,15 @@ def mapproject(gmtstring, lon, lat, verbose=False):
     command = 'mapproject -bo ' + gmtstring
 
     # Set up the  process
-    if verbose: print command 
+    if verbose: print(command)
     p = subprocess.Popen(command, shell=True,
-                     stdin=subprocess.PIPE, 
+                     stdin=subprocess.PIPE,
                      stdout=subprocess.PIPE)
 
     # Send lon, lat to mapproject
-    p.stdin.write("%s %s\n" % (str(lon), str(lat)))
+    p.stdin.write("{:f} {:f}".format(lon, lat))
 
-    # Get the output 
+    # Get the output
     out, err = p.communicate()
     x, y = struct.unpack('2d', out)
     return x, y
@@ -35,9 +39,9 @@ def invproj(projstring, x, y):
 
     command = 'invproj -o ' + projstring
 
-    #if verbose: print command
+    #if verbose: print(command)
     p = subprocess.Popen(command, shell=True,
-                     stdin=subprocess.PIPE, 
+                     stdin=subprocess.PIPE,
                      stdout=subprocess.PIPE)
 
     p.stdin.write("%s %s\n" % (str(x), str(y)))
@@ -65,7 +69,7 @@ if __name__ == '__main__':
     #verbose = True
 
     # ----------------------------
-    print "\n --- sphere ---\n"
+    print("\n --- sphere ---\n")
     # ----------------------------
 
     m = 193.713819606 / 208.754891658
@@ -83,7 +87,7 @@ if __name__ == '__main__':
     #ellipsoid = "--ELLIPSOID=Sphere"
     #ellipsoid = "--ELLIPSOID=WGS-84"
     ## Ser ut som ellipsoid er gitt på korrekt vis, men får feil
-    ## Setting virker for WGS84 
+    ## Setting virker for WGS84
     #ellipsoid = "--ELLIPSOID=%s" % str(gmap.ellipsoid.a)
     #ellipsoid = "--ELLIPSOID=%s" % "6378137,298.257223563" # WGS84 OK
     # Den under virker og gir WGS84
@@ -91,7 +95,7 @@ if __name__ == '__main__':
     #ellipsoid = "--ELLIPSOID=%s" % "6371000,f=0"
     ellipsoid = "--ELLIPSOID=%s" % "6371000,b=6371000"
 
-    
+
 
     extent = '-R0/1/60/61 --MAP_SCALE_FACTOR=%s' % str(1/m)   # Actual values are not used
     offset = '-C%s/%s' % (str(xp), str(yp))
@@ -100,21 +104,21 @@ if __name__ == '__main__':
     x0, y0 = gmap.ll2grid(lon, lat)
     x1, y1 = mapproject(gmtstring, lon, lat, verbose=True)
 
-    print "gmt mapproject : ", x1, y1
-    print "gmap.ll2grid   : ", x0, y0
-    print "difference [m] : ", ((x1-x0)**2 + (y1-y0)**2)**0.5 * gmap.dx
-    print
-    
+    print("gmt mapproject : ", x1, y1)
+    print("gmap.ll2grid   : ", x0, y0)
+    print("difference [m] : ", ((x1-x0)**2 + (y1-y0)**2)**0.5 * gmap.dx)
+    print()
+
     gmap = PolarStereographic(xp, yp, dx, ylon)
     lon0, lat0 = gmap.grid2ll(x, y)
     lon1, lat1 = mapproject('-I ' + gmtstring, x, y, verbose=True)
-    print "mapproject -I  : ", lon1, lat1
-    print "gmap.grid2ll   : ", lon0, lat0
+    print("mapproject -I  : ", lon1, lat1)
+    print("gmap.grid2ll   : ", lon0, lat0)
 
     #import sys; sys.exit(0)
 
     # ---------------------------
-    print "\n --- WGS84 ---\n"
+    print("\n --- WGS84 ---\n")
     # ---------------------------
 
     gmap = PolarStereographic(xp, yp, dx, ylon, ellipsoid="WGS84")
@@ -130,14 +134,13 @@ if __name__ == '__main__':
     x1, y1 = mapproject(gmtstring, lon, lat, verbose=True)
 
 
-    print "gmt mapproject : ", x1, y1
-    print "gmap.ll2grid   : ", x0, y0
-    print "difference [m] : ", ((x1-x0)**2 + (y1-y0)**2)**0.5 * gmap.dx
-    print
-    
+    print("gmt mapproject : ", x1, y1)
+    print("gmap.ll2grid   : ", x0, y0)
+    print("difference [m] : ", ((x1-x0)**2 + (y1-y0)**2)**0.5 * gmap.dx)
+    print()
+
     gmap = PolarStereographic(xp, yp, dx, ylon, ellipsoid="WGS84")
     lon0, lat0 = gmap.grid2ll(x, y)
     lon1, lat1 = mapproject('-I ' + gmtstring, x, y, verbose=True)
-    print "mapproject -I  : ", lon1, lat1
-    print "gmap.grid2ll   : ", lon0, lat0
-
+    print("mapproject -I  : ", lon1, lat1)
+    print("gmap.grid2ll   : ", lon0, lat0)

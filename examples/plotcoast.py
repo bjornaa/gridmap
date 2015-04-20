@@ -2,6 +2,8 @@
 
 """Plot a coast line made by makecoast"""
 
+from __future__ import print_function
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -10,8 +12,8 @@ coastfile = "demo10km_coast.dat"
 X, Y = np.loadtxt(coastfile, unpack=True)
 
 I = ~np.isnan(X)
-print "X: min, max = ", X[I].min(), X[I].max()
-print "Y: min, max = ", Y[I].min(), Y[I].max()
+print("X: min, max = ", X[I].min(), X[I].max())
+print("Y: min, max = ", Y[I].min(), Y[I].max())
 
 
 # Fill land

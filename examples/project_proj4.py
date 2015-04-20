@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
+
 #import sys
 import subprocess
 import struct
@@ -17,7 +19,7 @@ def proj(projstring, lon, lat):
 
     # Set up the proj process
     #if verbose: print command
-    print command
+    print(command)
     p = subprocess.Popen(command, shell=True,
                      stdin=subprocess.PIPE, 
                      stdout=subprocess.PIPE)
@@ -64,7 +66,7 @@ if __name__ == '__main__':
 
     #verbose = True
 
-    print "\n --- sphere ---\n"
+    print("\n --- sphere ---\n")
 
     gmap = PolarStereographic(xp, yp, dx, ylon)
 
@@ -72,18 +74,18 @@ if __name__ == '__main__':
     x1, y1 = proj(gmap.proj4string, lon, lat)
     x1, y1 = x1/gmap.dx, y1/gmap.dx
 
-    print "proj           : ", x1, y1
-    print "gmap.ll2grid   : ", x0, y0
-    print "difference [m] : ", ((x1-x0)**2 + (y1-y0)**2)**0.5 * gmap.dx
+    print("proj           : ", x1, y1)
+    print("gmap.ll2grid   : ", x0, y0)
+    print("difference [m] : ", ((x1-x0)**2 + (y1-y0)**2)**0.5 * gmap.dx)
 
     lon0, lat0 = gmap.grid2ll(x, y)
     lon1, lat1 = invproj(gmap.proj4string, x*gmap.dx, y*gmap.dx)
-    print
-    print "invproj        : ", lon1, lat1
-    print "gmap.grid2ll   : ", lon0, lat0
+    print()
+    print("invproj        : ", lon1, lat1)
+    print("gmap.grid2ll   : ", lon0, lat0)
 
 
-    print "\n --- WGS84 ---\n"
+    print("\n --- WGS84 ---\n")
 
     gmap = PolarStereographic(xp, yp, dx, ylon, ellipsoid='WGS84')
 
@@ -91,16 +93,17 @@ if __name__ == '__main__':
     x1, y1 = proj(gmap.proj4string, lon, lat)
     x1, y1 = x1/gmap.dx, y1/gmap.dx
 
-    print "proj           : ", x1, y1
-    print "gmap.ll2grid   : ", x0, y0
-    print "difference [m] : ", ((x1-x0)**2 + (y1-y0)**2)**0.5 * gmap.dx
+    print("proj           : ", x1, y1)
+    print("gmap.ll2grid   : ", x0, y0)
+    print("difference [m] : ", ((x1-x0)**2 + (y1-y0)**2)**0.5 * gmap.dx)
 
     gmap = PolarStereographic(xp, yp, dx, ylon, ellipsoid='WGS84')
     lon0, lat0 = gmap.grid2ll(x, y)
     lon1, lat1 = invproj(gmap.proj4string, x*gmap.dx, y*gmap.dx)
-    print
-    print "invproj        : ", lon1, lat1
-    print "gmap.grid2ll   : ", lon0, lat0
+    print()
+    print("invproj        : ", lon1, lat1)
+    print("gmap.grid2ll   : ", lon0, lat0)
+    
 
 
 
