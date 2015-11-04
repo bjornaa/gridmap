@@ -7,13 +7,13 @@
 
 XP=418.25            # X grid coordinate of north pole
 YP=257.25            # Y grid coordinate of north pole
-DX=10000.0           # Grid spacing [m] 
+DX=10000.0           # Grid spacing [m]
 YLON=58.0            # Longitude parallel to Y-axis
 
 LAT_TS=60.0          # Latitude of true scale
 RADIUS=6371000       # Earth radius [m] (spherical case)
 
-PROJ=/usr/bin/proj   # proj command
+PROJ=proj   # proj command
 
 # Multiply XP and YP with DX
 XPDX=$(echo "($XP*$DX)" | bc)
@@ -34,5 +34,3 @@ echo "Inverse: x = $X, y = $Y"
 $PROJ -I -m 1:$DX -f %9.6f +proj=stere +R=$RADIUS +lat_0=90.0 +lat_ts=$LAT_TS +x_0=$XPDX +y_0=$YPDX +lon_0=$YLON <<EOF
 0.0 0
 EOF
-
-
