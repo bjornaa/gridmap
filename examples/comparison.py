@@ -17,7 +17,7 @@ except ImportError:
 
 xp    = 418.25        # x grid coordinate of north pole
 yp    = 257.25        # y grid coordinate of north pole
-dx    = 1000        # grid resolution (at lat_ts)  [m]
+dx    = 10000        # grid resolution (at lat_ts)  [m]
 ylon  = 58.0          # angle of y-axis        [deg]
 
 x, y = 200.0, 100.0
@@ -46,65 +46,42 @@ def proj(projstring, lon, lat):
     out, err = p.communicate()
     return struct.unpack('2d', out)
 
+# TODO: Gather functions like gmt-forward in a utility-file
+# decide if xp, yp etc. should be arguments so that it is
+# independent of gridmap (must include optional parameters)
 def gmt_forward(gmap, lon, lat):
     """Use GMT mapproject for forward projection"""
 
-    # m = 193.713819606 / 208.754891658  # Hva fanden?
-    m = 1
-    # m = 1. / (1 +np.cos(np.pi / 3))  # 60 degrees
-    # m = 2./  (1 +np.cos(np.pi / 3))  # 60 degrees
-    # m = 309.672008317 / 283.177139485
-    projection = '-Js%s/90.0/%s/1:%s -Dm' % \
-                 (str(ylon), str(gmap.lat_ts), str(m*dx))
-    # projection = '-Js%s/90.0/%s/1:%s -F' % \
-    #         (str(ylon), str(gmap.lat_ts), str(2*dx))
+    ylon = gmap.ylon
 
-    #ellipsoid = ""
-    #ellipsoid = "--ELLIPSOID=Sphere"
-    #ellipsoid = "--ELLIPSOID=WGS-84"
-    ## Ser ut som ellipsoid er gitt på korrekt vis, men får feil
-    ## Setting virker for WGS84
-    #ellipsoid = "--ELLIPSOID=%s" % str(gmap.ellipsoid.a)
-    #ellipsoid = "--ELLIPSOID=%s" % "6378137,298.257223563" # WGS84 OK
-    # Den under virker og gir WGS84
-    #ellipsoid = "--ELLIPSOID=%s%s" % ("6378137,f=", str(1/298.257223563))
-    #ellipsoid = "--ELLIPSOID=%s" % "6371000,f=0"
-    ellipsoid = "--ELLIPSOID=%s" % "6371000,b=6371000"
+    projection = '-JS%s/90.0/1c -C' % str(ylon)
+    extent = '-R%g/%g/%g/%g' % (ylon-10, ylon+10, 60, 90)
 
-    m = 1 / (1 + np.sin(np.pi / 3))
-    # extent = '-R0/1/60/61 --MAP_SCALE_FACTOR=%s' % str(m)   # Actual values are not used
-    # extent = '-R0/1/60/61'   # Actual values are not used
-    extent = '-Rg'
-    # offset = '-C%s/%s' % (str(dx*xp), str(dx*yp))
-    offset=" "
-    command0 = 'GMT mapproject -bo'
-    gmtstring = " ".join((ellipsoid, projection, offset, extent))
-    command = " ".join((command0, ellipsoid, projection, offset, extent))
-    # Set up the  process
-    # if verbose: print(command)
+    a, b = gmap.ellipsoid.a, gmap.ellipsoid.b
+    ellipsoid = "--ELLIPSOID=%s,b=%s" % (a, b)
+
+    m = 0.5*(1 + np.sin(gmap.lat_ts*np.pi/180))
+    scale = '-F --MAP_SCALE_FACTOR=%s' % m
+
+    program = 'GMT mapproject -bo'
+    command = " ".join((program, ellipsoid, projection, extent, scale))
     print(command)
     p = subprocess.Popen(command, shell=True,
                      stdin=subprocess.PIPE,
                      stdout=subprocess.PIPE)
-
     # Send lon, lat to mapproject
     # p.stdin.write("{:f} {:f}\n".format(lon, lat))
     p.stdin.write("%s %s\n" % (str(lon), str(lat)))
-
-
-    # Get the output
     out, err = p.communicate()
-    # print("err, out = ", err, out)
     x, y = struct.unpack('dd', out)
-    #x = x / (m*dx) + xp
-    #y = y / (m*dx) + yp
+    x = x / gmap.dx + gmap.xp
+    y = y / gmap.dx + gmap.yp
     return x, y
 
 
 # --- Forward projection
 
 lon, lat = 2, 66   # Station M
-lon, lat = 0, 90   # Station M
 
 print("gmap.ll2grid   : ", *gmap.ll2grid(lon, lat))
 
