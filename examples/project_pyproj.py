@@ -18,7 +18,7 @@ print("\n --- sphere ---\n")
 
 gmap = gridmap.PolarStereographic(xp, yp, dx, ylon)
 
-#print gmap.proj4string
+print(gmap.proj4string)
 
 
 

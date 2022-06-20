@@ -6,6 +6,9 @@ Reverse engingeer a polar stereographic grid to find the grid mapping
 Assumes spherical earth, R = 6361 km
 and true scale at 60 degrees north
 
+2022-06-20: Obsolete, use stereoparameters.py instead
+This uses the pyproj package and handles WGS84 projections as well
+
 """
 from __future__ import print_function
 
