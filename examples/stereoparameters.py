@@ -2,7 +2,11 @@
 
 Script to find parameters for a polar stereographic projection from a ROMS file.
 
-Known parameter may be explicitly prescribed initially.
+Known parameter may be explicitly prescribed initially. 
+If the pm and/or angle variables is missing, the result may be inaccurate
+for instance dx = 800.007 and ylon = 70.001 for NorKyst800 (version 2)
+Put in reasonable nice rounded values for dx and ylon and rerun the script.
+
 If the ellipsoid is unknown, try both.
 
 """
@@ -15,17 +19,21 @@ If the ellipsoid is unknown, try both.
 
 
 from math import pi
+from pathlib import Path
 
 import pyproj
 from netCDF4 import Dataset
 
 # --- Settings ---
 
-ROMS_file = "/home/bjorn/data/mf/norkyst_800m_avg.nc4_2015123012"
+datadir = Path("/home/bjorn/data/osea/scratch/ROMS/NorKyst-800m_Lus2/his/2020")
+# datadir = Path("gpfs/gpfs0/osea/scratch/ROMS/NorKyst-800m_Lus2/his/2020")
+romsfile = "norkyst_800m_his.nc4_2020122801-2020122900"
+
 
 # Parameter settings
-ellipsis = "WGS84"
-# ellipsis = "sphere"
+# ellipsis = "WGS84"
+ellipsis = "sphere"
 
 dx = None
 ylon = None
@@ -43,23 +51,36 @@ else:
     proj_params["R"] = 6371000  # Spherical with standard earth radius
 proj = pyproj.Proj(proj_params)
 
-ncid = Dataset(ROMS_file)
+ncid = Dataset(datadir / romsfile)
 lon0, lat0 = ncid.variables["lon_rho"][0, 0], ncid.variables["lat_rho"][0, 0]
 
 # Find dx
-# Suppose file has pm
 if dx is None:
-    pm0 = ncid.variables["pm"][0, 0]
-    dx0 = 1 / pm0
+    try:  # Easier and more accurate solution if pm variable is present
+        pm0 = ncid.variables["pm"][0, 0]
+        dx0 = 1 / pm0
+    except KeyError:  # No pm variable
+        lon1 = ncid.variables["lon_rho"][1, 0]
+        lat1 = ncid.variables["lat_rho"][1, 0]
+        geod = pyproj.Geod(ellps=proj_params["ellps"])
+        _, _, dx0 = geod.inv(lon0, lat0, lon1, lat1)
+
     scale = proj.get_factors(lon0, lat0).parallel_scale
     dx = round(scale * dx0, 3)
 print(f"dx   = {dx:9.3f}")
 
 # Find ylon
-# Suppose file has angle variable
 if ylon is None:
-    angle0 = ncid.variables["angle"][0, 0]
-    ylon = round(float(angle0 * DEG + lon0), 3)
+    try:  # Easier and more accurate solution if angle variable is present
+        angle0 = ncid.variables["angle"][0, 0]
+        ylon = round(float(lon0 + angle0 * DEG), 3)
+    except KeyError:  # No angle variable
+        lon1 = ncid.variables["lon_rho"][1, 0]
+        lat1 = ncid.variables["lat_rho"][1, 0]
+        geod = pyproj.Geod(ellps=proj_params["ellps"])
+        a0, _, _ = geod.inv(lon0, lat0, lon1, lat1)
+        ylon = round(lon0 - a0, 3)
+
 print(f"ylon = {ylon:9.3f}")
 # Update the projection
 proj_params["lon_0"] = ylon
